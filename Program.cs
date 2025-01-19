@@ -10,10 +10,11 @@ namespace PacificBattle
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add Razor Services 
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            // Register DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
@@ -22,11 +23,10 @@ namespace PacificBattle
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure HTTP Request Pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
