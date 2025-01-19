@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using PacificBattle.Components;
+using PacificBattle.Data;
 
 namespace PacificBattle
 {
@@ -11,6 +13,9 @@ namespace PacificBattle
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite("Data Source = pacificbattle.db"));
 
             var app = builder.Build();
 
