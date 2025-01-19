@@ -15,7 +15,10 @@ namespace PacificBattle
                 .AddInteractiveServerComponents();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite("Data Source = pacificbattle.db"));
+            {
+                var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
+                options.UseSqlite($"Data Source={dbPath}");
+            });
 
             var app = builder.Build();
 

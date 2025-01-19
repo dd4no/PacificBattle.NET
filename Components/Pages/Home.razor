@@ -1,7 +1,23 @@
 ﻿@page "/"
+@inject AppDbContext db
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+@foreach (var side in Sides)
+{
+    <li>@side.SideName</li>
+}
+
+@code
+{
+    private List<Side> Sides = new();
+
+    protected override void OnInitialized()
+    {
+        Sides = db.Sides.ToList();
+    }
+}
+
+
