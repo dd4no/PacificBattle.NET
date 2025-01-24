@@ -1,0 +1,17 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PacificBattle.Models
+{
+    public class Ship
+    {
+        [Key]
+        public int ShipId { get; set; }
+        [Column("name")]
+        public string? ShipName { get; set; }
+        public int Attack { get; set; }
+        public int Armor { get; set; }
+        public int Speed { get; set; }
+        public int Turn { get; set; }
+    }
+}
