@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PacificBattle.Components;
 using PacificBattle.Data;
+using Serilog;
 
 namespace PacificBattle
 {
@@ -8,13 +9,18 @@ namespace PacificBattle
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File("data/logs/log.txt", 
+                    rollingInterval: RollingInterval.Day, 
+                    rollOnFileSizeLimit: true)
+                .CreateLogger();
+
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add Razor Services 
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            // Register DbContext
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
@@ -23,7 +29,7 @@ namespace PacificBattle
 
             var app = builder.Build();
 
-            // Configure HTTP Request Pipeline.
+            // Configure HTTP Request Pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
@@ -37,6 +43,7 @@ namespace PacificBattle
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+            Log.Information("Battle Started...");
 
             app.Run();
         }
