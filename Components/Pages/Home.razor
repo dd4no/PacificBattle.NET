@@ -10,14 +10,21 @@
     <li>@side.SideName</li>
 }
 
-<h1 class="text-center text-danger">Hello, world!</h1>
+@foreach (var ship in Ships)
+{
+    <li>@ship.ShipName @ship.Attack @ship.Armor @ship.Speed</li>
+}
+
+<h1 class="text-center text-danger">Let the Battle Begin!</h1>
 
 @code
 {
     private List<Side> Sides = new();
+    private List<Ship> Ships = new();
 
     protected override void OnInitialized()
     {
         Sides = db.Sides.ToList();
+        Ships = db.Ships.Where(x => x.Turn == 1 && x.NavyId == 2).ToList();
     }
 }
