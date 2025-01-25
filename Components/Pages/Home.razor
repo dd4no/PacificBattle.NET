@@ -5,10 +5,11 @@
 
 <h1>Hello, world!</h1>
 
-@foreach (var side in Sides)
-{
-    <li>@side.SideName</li>
-}
+<p>Dice to Roll:
+    <input type="number" @bind-value="Rolls" @bind-value:event="oninput" @onchange="UpdateRoller" />
+</p>
+
+<DiceRoller Rolls="Rolls"></DiceRoller>
 
 @foreach (var ship in Ships)
 {
@@ -19,12 +20,11 @@
 
 @code
 {
-    private List<Side> Sides = new();
-    private List<Ship> Ships = new();
+    private int Rolls { get; set; } = 1;
 
-    protected override void OnInitialized()
+    private void UpdateRoller(ChangeEventArgs e)
     {
-        Sides = db.Sides.ToList();
-        Ships = db.Ships.Where(x => x.Turn == 1 && x.NavyId == 2).ToList();
+        Rolls = Convert.ToInt32(e.Value);
+        // StateHasChanged();
     }
 }
