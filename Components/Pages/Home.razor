@@ -3,28 +3,10 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-<p>Dice to Roll:
-    <input type="number" @bind-value="Rolls" @bind-value:event="oninput" @onchange="UpdateRoller" />
-</p>
-
-<DiceRoller Rolls="Rolls"></DiceRoller>
-
-@foreach (var ship in Ships)
-{
-    <li>@ship.ShipName @ship.Attack @ship.Armor @ship.Speed</li>
-}
-
-<h1 class="text-center text-danger">Let the Battle Begin!</h1>
+<h1 class="text-center strong">WAR IN THE PACIFIC</h1>
+<h2 class="text-center text-danger">Let the Battle Begin!</h2>
 
 @code
-{
-    private int Rolls { get; set; } = 1;
-
-    private void UpdateRoller(ChangeEventArgs e)
-    {
-        Rolls = Convert.ToInt32(e.Value);
-        // StateHasChanged();
-    }
+{   
+    
 }
