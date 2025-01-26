@@ -1,0 +1,89 @@
+﻿@page "/battlebox"
+@inject AppDbContext db
+@inject Attacker attacker
+
+<div id="battlebox" class="d-flex m-1 p-1">
+
+    <div class="w-50 m-2 p-4">
+        <h1 class="strong">@Attacker.ShipName</h1>
+        <div class="d-flex">
+            <p class="pe-2">@Attacker.Attack</p>
+            <p class="pe-2">@Attacker.Armor</p>
+            <p class="pe-2">@Attacker.Speed</p>
+        </div>
+    </div>
+
+    <div class="w-50 m-2 p-4">
+        <h1 class="strong">@Defender.ShipName</h1>
+        <div class="d-flex">
+            <p class="pe-2">@Defender.Attack</p>
+            <p class="pe-2">@Defender.Armor</p>
+            <p class="pe-2">@Defender.Speed</p>
+        </div>
+    </div>
+
+</div>
+
+<button class="btn btn-danger m-1 p-3" @onclick="StartCombat"><b>WAR!</b></button>
+
+<p>@message</p>
+<button class="btn btn-success m-1 p-3" @onclick="GetShips"><b>Get Ships</b></button>
+
+
+@code 
+{
+    public string message = string.Empty;
+
+    public List<Ship> Allies { get; set; } = new();
+    public List<Ship> Japan { get; set; } = new();
+    public CombatShip Attacker { get; set; } = new();
+    public CombatShip Defender { get; set; } = new();
+
+    private static readonly Random random = new Random();
+
+    protected override void OnInitialized()
+    {
+        Allies = db.Ships.Where(x => x.NavyId == 1).ToList();
+
+        Japan = db.Ships.Where(x => x.NavyId == 2).ToList();
+
+        GetShips();
+    } 
+    
+    private void GetShips()
+    {
+        var randomAttacker = random.Next(Japan.Count+1);
+        var randomDefender = random.Next(Allies.Count+1);
+
+        Attacker = new CombatShip 
+        {
+            ShipName = Japan[randomAttacker].ShipName!,
+            Attack = Japan[randomAttacker].Attack,
+            Armor = Japan[randomAttacker].Armor,
+            Speed = Japan[randomAttacker].Speed,
+            Damage = new(),
+        };
+
+        Defender = new CombatShip
+        {
+            ShipName = Allies[randomDefender].ShipName!,
+            Attack = Allies[randomDefender].Attack,
+            Armor = Allies[randomDefender].Armor,
+            Speed = Allies[randomDefender].Speed,
+            Damage = new(),
+        };
+
+    }
+
+    private void StartCombat()
+    {
+        message = string.Empty;
+        attacker.Target = Defender;
+        attacker.ResolveAttack(Attacker.Attack);
+        if (attacker.Target.IsDestroyed)
+        {
+            message = $"{attacker.Target.ShipName} has been destroyed!";
+            Log.Information($"{attacker.Target.ShipName} has been destroyed!");
+        };
+    }
+}

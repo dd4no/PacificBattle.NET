@@ -1,0 +1,18 @@
+﻿@* Number Selector *@
+
+<div class="text-center">
+
+    <h4 class="text-center">Select Number</h4>
+
+    <InputSelect class="form-select w-25 m-auto" @bind-Value="numberSelected">
+        @foreach (var choice in choices)
+        {
+            <option value="@choice">@choice</option>
+        }
+    </InputSelect>
+</div>
+@code 
+{
+    public int numberSelected { get; set; }
+    private List<int> choices = new List<int> { 1, 2, 3, 4, 5, 6 };
+}

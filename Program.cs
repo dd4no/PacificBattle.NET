@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PacificBattle.Classes;
 using PacificBattle.Components;
 using PacificBattle.Data;
 using Serilog;
@@ -13,7 +14,8 @@ namespace PacificBattle
                 .MinimumLevel.Debug()
                 .WriteTo.File("data/logs/log.txt", 
                     rollingInterval: RollingInterval.Day, 
-                    rollOnFileSizeLimit: true)
+                    rollOnFileSizeLimit: true,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss [{Level}] -- {Message}{NewLine}{Exception}")
                 .CreateLogger();
 
             var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,10 @@ namespace PacificBattle
                 var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
                 options.UseSqlite($"Data Source={dbPath}");
             });
+
+            builder.Services.AddSingleton<Roller>();
+            builder.Services.AddSingleton<Attacker>();
+
 
             var app = builder.Build();
 
