@@ -1,38 +1,39 @@
-﻿@* Standard Dice Calculator *@
-
+﻿@* Dice Roller *@
 @rendermode InteractiveServer
 
 <div class="text-center border">
 
-    <h3>Dice Roller</h3>
-    <h4>Number of Dice: @numberOfDice</h4>
+    <h4>d @DiceSides</h4>
+    <h5>Number of Dice: @NumberOfDice</h5>
     <button @onclick="RollDice">Roll Dice</button>
-   
+
     <div class="m-auto pt-4 w-75 d-flex align-items-center justify-content-between">
         @foreach (var roll in diceRolls)
         {
-            <div class="border"><b>@roll</b></div>
+            <div class="p-4 border"><b>@roll</b></div>
         }
     </div>
-    
+
 </div>
 
 @code 
 {
+    [Parameter]
+    public int NumberOfDice { get; set; } = 1;
+    [Parameter]
+    public int DiceSides { get; set; } = 6;
 
-    private int numberOfDice = 6;
-    private int diceSides = 6;
     private List<int> diceRolls = new();
-    
-    private void RollDice()
+
+    private static readonly Random random = new Random();    
+
+    public void RollDice()
     {
         diceRolls.Clear();
-        Random random = new Random();
         
-        for (int i = 0; i < numberOfDice; i++)
+        for (int i = 0; i < NumberOfDice; i++)
         {
-             diceRolls.Add(random.Next(1, diceSides + 1));
+             diceRolls.Add(random.Next(1, DiceSides + 1));
         }
     }
-
 }
