@@ -1,50 +1,26 @@
 ﻿@page "/"
+@inject NavigationManager nav
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Pacific Battle</PageTitle>
 
-<div class="m-3 p-3 border">
 
-    <div class="w-50 m-auto p-3 border">
-        <h1 class="text-center strong">WAR IN THE PACIFIC</h1>
-        <h2 class="text-center text-danger">Let the Battle Begin!</h2>
+<div class="m-4 p-4 border">
+
+    <div class="w-50 m-auto p-4 border">
+        <h1 class="text-center">WAR IN THE PACIFIC</h1>
+        <h3 class="text-center text-danger">Let the Battle Begin!</h3>
     </div>
 
-    <div class="text-center">
-        <h4 class="text-center">Select Number Of Dice</h4>
-        <InputSelect class=" w-25 m-auto" @bind-Value="numberOfDice">
-            @foreach (var die in dice)
-            {
-                <option value="@die">@die</option>
-            }
-        </InputSelect>
-    </div>
-
-    <div class="text-center">
-        <h4 class="text-center">Select Number Of Sides</h4>
-        <InputSelect class=" w-25 m-auto" @bind-Value="numberOfSides">
-            @foreach (var side in sides)
-            {
-                <option value="@side">@side</option>
-            }
-        </InputSelect>  
-    </div>
-
-    <div class="m-3 p-2">
-        <DiceRoller NumberOfDice="numberOfDice" DiceSides="numberOfSides"/>
-    </div>
-
-    <div class="d-flex">
-        <JapanFleet />
-        <AlliedFleet />
+    <div class="text-center m-4 p-4">
+        <button class="btn btn-warning m-4 p-4" @onclick="LoadBattlebox">Wage War</button>
     </div>
 
 </div>
 
 @code
 {
-    private int numberOfDice = 1;
-    private int numberOfSides = 6;
-    private List<int> dice = new List<int> { 1, 2, 3, 4, 5, 6 };
-    private List<int> sides = new List<int> { 4, 6, 8, 10, 12, 20 };
-
+    public void LoadBattlebox()
+    {
+        nav.NavigateTo("/battlebox");
+    }
 }

@@ -3,7 +3,7 @@ using Serilog;
 
 namespace PacificBattle.Classes
 {
-    public class Attacker
+    public class Attack
     {
         private readonly Roller roller = new();
 
@@ -12,11 +12,11 @@ namespace PacificBattle.Classes
         public List<int> Results { get; set; } = [];
 
 
-        public void ResolveAttack(int attack)
+        public void ResolveAttack(int numberOfAttacks)
         {
             Log.Information("Resolving attack");
             Results.Clear();
-            Results = roller.Roll(attack);
+            Results = roller.Roll(numberOfAttacks);
             Target.Damage.CheckForDisabled(Results);
             Target.Damage.CalculateDamage(Results);
             Log.Information("Attack complete");
