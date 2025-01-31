@@ -1,55 +1,50 @@
-﻿using Serilog;
-
-namespace PacificBattle.Classes
+﻿namespace PacificBattle.Classes
 {
     public class Damage
     {
         private readonly Roller roller = new();
 
-        public int Hits { get; set; }
+        public int TotalHits { get; set; }
         public int TotalDamage { get; set; }
         public bool IsDisabled { get; set; }
 
-        public void CheckForDisabled(List<int> results)
-        {
-            if (results.Contains(5))
-            {
-                Log.Information("Ship is disabled");
-                IsDisabled = true;
-            }
-        }
+        public List<string> CombatResults { get; set; } = new();
 
         public void CalculateDamage(List<int> results)
         {
-            Log.Information("Calculating damage");
             int damage = 0;
             int hits = 0;
 
-            // Count Hits
             foreach (var result in results)
             {
                 if (result == 6)
                 {
-                    Log.Information("Hit!");
+                    CombatResults.Add("Hit!");
                     hits++;
                 }
+                else if (result == 5)
+                {
+                    CombatResults.Add("Disabling Hit");
+                    IsDisabled = true;
+                    TotalHits++;
+                }
+                else
+                {
+                    CombatResults.Add("Miss");
+                }
             }
-
-            // Add to total hits endured
-            Hits += hits;
-            Log.Information("Number of hits: " + hits);
+            TotalHits += hits;
+            CombatResults.Add(hits + " hits");
 
             // Roll for damage
             var damageRolls = roller.Roll(hits);
             foreach (var roll in damageRolls)
             {
-                Log.Information("Damage roll: " + roll);
                 damage += roll;
             }
 
             TotalDamage += damage;
-            Log.Information("Total damage added: " + damage);
-            Log.Information("Total damage: " + TotalDamage);
+            CombatResults.Add(damage + " damage taken");
         }
     }
 }

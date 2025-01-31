@@ -8,8 +8,6 @@ namespace PacificBattle.Classes
 
         public List<int> Roll(int rolls)
         {
-            Log.Information("{rolls} rolls", rolls);
-
             List<int> results = new();
 
             for (int i = 0; i < rolls; i++)

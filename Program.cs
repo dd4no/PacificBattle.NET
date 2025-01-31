@@ -30,7 +30,7 @@ namespace PacificBattle
             });
 
             builder.Services.AddSingleton<Roller>();
-            builder.Services.AddSingleton<Attack>();
+            builder.Services.AddSingleton<AttackResolver>();
 
 
             var app = builder.Build();
