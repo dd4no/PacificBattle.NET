@@ -1,0 +1,126 @@
+﻿@page "/battlebox"
+@inject AppDbContext db
+@inject AttackResolver AttackResolver
+
+<div id="battlebox" class="d-flex justify-content-between m-1 p-1">
+
+    @* Attack Ship *@
+    <div class="text-center m-2 p-4">
+        <h1 class="strong">@Attacker.ShipName</h1>
+        <div class="d-flex justify-content-between">
+            <p class="">@Attacker.Attack</p>
+            <p class="">@Attacker.Armor</p>
+            <p class="">@Attacker.Speed</p>
+        </div>
+    </div>
+
+    @* Combat Results *@
+    <div class="flex-column text center">
+        <h5 class="strong">Combat Results</h5>
+        <br />
+        @if (Defender.Damage.CombatResults is not null)
+        {
+            @foreach (var message in Defender.Damage.CombatResults)
+            {
+                <p>@message</p>
+            }
+        }
+    </div>
+
+    @* Defender Ship *@
+    <div class="text-center m-2 p-4">
+        <h1 class="strong">@Defender.ShipName</h1>
+        <div class="d-flex justify-content-between">
+            <p class="">@Defender.Attack</p>
+            <p class="">@Defender.Armor</p>
+            <p class="">@Defender.Speed</p>
+        </div>
+        <br />
+        <p class="">Hits Taken: @Defender.Damage.TotalHits</p>
+        <p class="">Damage Taken: @Defender.Damage.TotalDamage</p>
+        <p class="">@Message</p>
+    </div>
+
+</div>
+
+@if (!isResolved)
+{
+    <div class="text-center">
+        <button class="btn btn-danger m-1 p-3" @onclick="StartCombat"><b>FIRE!</b></button>
+    </div>
+}
+
+<div class="text-center">
+    <button class="btn btn-success m-4 p-4" @onclick="GetShips"><b>Get Ships</b></button>
+</div>
+
+
+@code 
+{
+    private static readonly Random random = new Random();
+
+    private List<Ship> Allies { get; set; } = new();
+    private List<Ship> Japan { get; set; } = new();
+
+    public CombatShip Attacker { get; set; } = new();
+    public CombatShip Defender { get; set; } = new();
+    public string Message { get; set; } = string.Empty;
+
+    private bool isResolved = false;
+
+    protected override void OnInitialized()
+    {
+        Allies = db.Ships.Where(x => x.NavyId == 1).ToList();
+        Japan = db.Ships.Where(x => x.NavyId == 2).ToList();
+        GetShips();
+    } 
+    
+    private void GetShips()
+    {
+        isResolved = false;
+        Message = string.Empty;
+        var randomAttackShipIndex = random.Next(Japan.Count+1);
+        var randomDefenderShipIndex = random.Next(Allies.Count+1);
+
+        Attacker = new CombatShip 
+        {
+            ShipName = Japan[randomAttackShipIndex].ShipName!,
+            Attack = Japan[randomAttackShipIndex].Attack,
+            Armor = Japan[randomAttackShipIndex].Armor,
+            Speed = Japan[randomAttackShipIndex].Speed,
+            Airstrike = Japan[randomAttackShipIndex].Airstrike,
+            HasAttackBonus = Japan[randomAttackShipIndex].HasAttackBonus,
+            EndTurn = Japan[randomAttackShipIndex].EndTurn,
+            Damage = new(),
+        };
+
+        Defender = new CombatShip
+        {
+            ShipName = Allies[randomDefenderShipIndex].ShipName!,
+            Attack = Allies[randomDefenderShipIndex].Attack,
+            Armor = Allies[randomDefenderShipIndex].Armor,
+            Speed = Allies[randomDefenderShipIndex].Speed,
+            Airstrike = Allies[randomDefenderShipIndex].Airstrike,
+            HasAttackBonus = Allies[randomDefenderShipIndex].HasAttackBonus,
+            EndTurn = Allies[randomDefenderShipIndex].EndTurn,
+            Damage = new(),
+        };
+    }
+
+    private void StartCombat()
+    {
+        AttackResolver.Target = Defender;
+        Message = string.Empty;
+        AttackResolver.ResolveAttack(Attacker.Attack);
+        if (Defender.Damage.IsDisabled)
+        {
+            Message = "Ship has been disabled!";
+            isResolved = true;
+        };
+        if (Defender.IsDestroyed)
+        {
+            Message = "Ship has been destroyed!";
+            isResolved = true;
+        };
+    }
+}

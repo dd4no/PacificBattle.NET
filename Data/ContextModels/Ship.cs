@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PacificBattle.Models
+namespace PacificBattle.Data.ContextModels
 {
     public class Ship
     {
@@ -15,8 +15,8 @@ namespace PacificBattle.Models
         public int Armor { get; set; }
         public int Speed { get; set; }
         public int Airstrike { get; set; }
-        public bool HasAttackBonus { get; set; }        
-        public int? EndTurn { get; set; }
+        public bool HasAttackBonus { get; set; }
+        public int EndTurn { get; set; }
         public string? LocationGroup { get; set; }
     }
 }

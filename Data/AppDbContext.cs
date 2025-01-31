@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PacificBattle.Models;
+using PacificBattle.Data.ContextModels;
 
 namespace PacificBattle.Data
 {
