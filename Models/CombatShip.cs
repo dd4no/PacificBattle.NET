@@ -5,6 +5,7 @@ namespace PacificBattle.Models
     public class CombatShip
     {
         public string ShipName { get; set; } = string.Empty;
+        public int NavyId { get; set; }
         public int Attack { get; set; }
         public int Armor { get; set; }
         public int Speed { get; set; }

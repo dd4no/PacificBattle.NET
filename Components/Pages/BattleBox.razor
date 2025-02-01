@@ -2,17 +2,10 @@
 @inject AppDbContext db
 @inject AttackResolver AttackResolver
 
-<div id="battlebox" class="d-flex justify-content-between m-1 p-1">
+<div id="battlebox" class="d-flex justify-content-between m-auto p-2">
 
     @* Attack Ship *@
-    <div class="text-center m-2 p-4">
-        <h1 class="strong">@Attacker.ShipName</h1>
-        <div class="d-flex justify-content-between">
-            <p class="">@Attacker.Attack</p>
-            <p class="">@Attacker.Armor</p>
-            <p class="">@Attacker.Speed</p>
-        </div>
-    </div>
+    <ShipTile Ship="Attacker"></ShipTile>
 
     @* Combat Results *@
     <div class="flex-column text center">
@@ -28,32 +21,31 @@
     </div>
 
     @* Defender Ship *@
-    <div class="text-center m-2 p-4">
-        <h1 class="strong">@Defender.ShipName</h1>
-        <div class="d-flex justify-content-between">
-            <p class="">@Defender.Attack</p>
-            <p class="">@Defender.Armor</p>
-            <p class="">@Defender.Speed</p>
+    <ShipTile Ship="Defender"></ShipTile>
+</div>
+<div id="buttonbox" class="text-center mb-1 ">
+
+    @if (!isResolved)
+    {
+        <div>
+            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat"><b>FIRE!</b></button>
         </div>
-        <br />
-        <p class="">Hits Taken: @Defender.Damage.TotalHits</p>
-        <p class="">Damage Taken: @Defender.Damage.TotalDamage</p>
-        <p class="">@Message</p>
+    }
+
+    <div>
+        <button class="btn btn-success m-4 p-4" @onclick="GetShips"><b>Get Ships</b></button>
     </div>
 
 </div>
 
-@if (!isResolved)
-{
-    <div class="text-center">
-        <button class="btn btn-danger m-1 p-3" @onclick="StartCombat"><b>FIRE!</b></button>
-    </div>
-}
-
-<div class="text-center">
-    <button class="btn btn-success m-4 p-4" @onclick="GetShips"><b>Get Ships</b></button>
-</div>
-
+<style>
+    #battlebox {
+        background-color: cyan;
+    }
+    #buttonbox {
+        background-color: gray;
+    }
+</style>
 
 @code 
 {
@@ -70,7 +62,7 @@
 
     protected override void OnInitialized()
     {
-        Allies = db.Ships.Where(x => x.NavyId == 1).ToList();
+        Allies = db.Ships.Where(x => x.NavyId == 1 || x.NavyId == 3 || x.NavyId == 4).ToList();
         Japan = db.Ships.Where(x => x.NavyId == 2).ToList();
         GetShips();
     } 
@@ -85,6 +77,7 @@
         Attacker = new CombatShip 
         {
             ShipName = Japan[randomAttackShipIndex].ShipName!,
+            NavyId = Japan[randomAttackShipIndex].NavyId,
             Attack = Japan[randomAttackShipIndex].Attack,
             Armor = Japan[randomAttackShipIndex].Armor,
             Speed = Japan[randomAttackShipIndex].Speed,
@@ -97,6 +90,7 @@
         Defender = new CombatShip
         {
             ShipName = Allies[randomDefenderShipIndex].ShipName!,
+            NavyId = Allies[randomDefenderShipIndex].NavyId,
             Attack = Allies[randomDefenderShipIndex].Attack,
             Armor = Allies[randomDefenderShipIndex].Armor,
             Speed = Allies[randomDefenderShipIndex].Speed,

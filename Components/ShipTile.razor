@@ -1,0 +1,75 @@
+﻿<div class="text-center shipTile @color">
+    <h3 class="strong">@Ship.ShipName</h3>
+    <div class="d-flex justify-content-between">
+        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Attack</p>
+        <p class="">@Ship.Armor</p>
+        <p class="">@Ship.Speed</p>
+        @if (Ship.Airstrike != 0)
+        {
+            <p>@Ship.Airstrike</p>
+        }
+    </div>
+</div>
+
+<style>
+    .shipTile {
+        width: 500px;
+        height: 500px;
+        margin: 2rem;
+        padding: 2rem;
+        border: 2px solid black;
+    }
+
+    .blue {
+    background-color: blue;
+    color: white;
+    }
+    .red {
+    background-color: red;
+    }
+    .green {
+    background-color: green;
+    }
+    .yellow {
+    background-color: yellow;
+    }
+</style>
+
+@code 
+{
+    [Parameter]
+    public CombatShip Ship { get; set; } = new();
+
+    private string color = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        color = SetColor(Ship.NavyId);
+        StateHasChanged();
+    }
+
+    private string SetColor(int navyId)
+    {
+        string color = string.Empty;
+        switch (navyId)
+        {
+            case 1:
+                color = "blue";
+                break;
+            case 2:
+                color = "red";
+                break;
+            case 3:
+                color = "green";
+                break;
+            case 4:
+                color = "yellow";
+                break;
+            default:
+                color = string.Empty;
+                break;
+        }
+
+        return color;
+    }
+}
