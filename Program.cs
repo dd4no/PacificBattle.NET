@@ -24,7 +24,6 @@ namespace PacificBattle
                 options.UseSqlite($"Data Source={dbPath}");
             });
 
-            builder.Services.AddSingleton<Roller>();
             builder.Services.AddSingleton<AttackCoordinator>();
 
 

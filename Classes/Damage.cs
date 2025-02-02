@@ -4,8 +4,6 @@ namespace PacificBattle.Classes
 {
     public class Damage
     {
-        private readonly Roller roller = new();
-
         public int TotalHits { get; set; }
         public int TotalDamage { get; set; }
         public bool IsDisabled { get; set; }
@@ -40,11 +38,7 @@ namespace PacificBattle.Classes
             CombatLog.Add(damageHits + " damage hits");
 
             // Roll for damage
-            var damageRolls = roller.Roll(damageHits);
-            foreach (var roll in damageRolls)
-            {
-                damage += roll;
-            }
+            var damageRolls = Roller.RollDamage(damageHits);
 
             TotalDamage += damage;
             CombatLog.Add(damage + " damage taken");
