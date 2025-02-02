@@ -10,48 +10,68 @@ namespace PacificBattle
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File("data/logs/log.txt", 
-                    rollingInterval: RollingInterval.Day, 
-                    rollOnFileSizeLimit: true,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss [{Level}] -- {Message}{NewLine}{Exception}")
-                .CreateLogger();
-
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
-
-            builder.Services.AddDbContext<AppDbContext>(options =>
+            try
             {
-                var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
-                options.UseSqlite($"Data Source={dbPath}");
-            });
+                // Create Builder
+                var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddSingleton<Roller>();
-            builder.Services.AddSingleton<AttackResolver>();
+                // Configure Logging
+                builder.Services.AddSerilog((config) => config
+                        .ReadFrom.Configuration(builder.Configuration));
 
+                // Add Razor
+                builder.Services.AddRazorComponents()
+                    .AddInteractiveServerComponents();
 
-            var app = builder.Build();
+                // Register Db
+                builder.Services.AddDbContext<AppDbContext>(options =>
+                {
+                    var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
+                    options.UseSqlite($"Data Source={dbPath}");
+                });
 
-            // Configure HTTP Request Pipeline
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
+                // Add Other Services
+                builder.Services.AddSingleton<Roller>();
+                builder.Services.AddSingleton<AttackResolver>();
+
+                // Build
+                var app = builder.Build();
+                Log.Information("------------------------------");
+                Log.Information("");
+                Log.Information("Initializing...");
+                Log.Information("Application Built.");
+
+                // Configure HTTP request pipeline
+                app.UseSerilogRequestLogging();
+
+                if (!app.Environment.IsDevelopment())
+                {
+                    app.UseExceptionHandler("/Error");
+                    app.UseHsts();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseStaticFiles();
+                app.UseAntiforgery();
+
+                app.MapRazorComponents<App>()
+                    .AddInteractiveServerRenderMode();
+
+                Log.Information("Starting...");
+                Log.Information("");
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseStaticFiles();
-            app.UseAntiforgery();
-
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
-            Log.Information("Battle Started...");
-
-            app.Run();
+            catch (Exception ex)
+            {
+                Log.Information("Doh! Unexpected Termination!");
+            }
+            finally
+            {
+                Log.Information("... Exiting.");
+                Log.CloseAndFlush();
+            }
         }
     }
 }
