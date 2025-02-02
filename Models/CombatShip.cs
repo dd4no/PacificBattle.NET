@@ -1,10 +1,11 @@
 ﻿using PacificBattle.Classes;
-using PacificBattle.Data.ContextModels;
 
 namespace PacificBattle.Models
 {
     public class CombatShip
     {
+        public int ShipId { get; set; }
+        public string Type { get; set; } = string.Empty;
         public int NavyId { get; set; }
         public int EndTurn { get; set; }
 
@@ -17,7 +18,7 @@ namespace PacificBattle.Models
         public bool HasAttackBonus { get; set; }
 
         public Damage Damage { get; set; } = new();
-        public bool IsDestroyed => Damage.TotalDamage >= Armor;
+        public bool IsSunk => Damage.TotalDamage >= Armor;
 
         public Location Location { get; set; } = new();
     }
