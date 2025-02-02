@@ -2,7 +2,7 @@
 
 namespace PacificBattle.Classes
 {
-    public class AttackResolver
+    public class AttackCoordinator
     {
         private readonly Roller roller = new();
 

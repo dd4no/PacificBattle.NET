@@ -10,15 +10,10 @@ namespace PacificBattle
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File("data/logs/log.txt", 
-                    rollingInterval: RollingInterval.Day, 
-                    rollOnFileSizeLimit: true,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss [{Level}] -- {Message}{NewLine}{Exception}")
-                .CreateLogger();
-
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Host.UseSerilog((context, services, configuration) =>
+                configuration.ReadFrom.Configuration(context.Configuration));
 
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -30,7 +25,7 @@ namespace PacificBattle
             });
 
             builder.Services.AddSingleton<Roller>();
-            builder.Services.AddSingleton<AttackResolver>();
+            builder.Services.AddSingleton<AttackCoordinator>();
 
 
             var app = builder.Build();
@@ -49,7 +44,7 @@ namespace PacificBattle
 
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-            Log.Information("Battle Started...");
+            Log.Information("Starting PacificBattle...");
 
             app.Run();
         }

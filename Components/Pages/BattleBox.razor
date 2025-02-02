@@ -1,6 +1,7 @@
 ﻿@page "/battlebox"
 @inject AppDbContext db
-@inject AttackResolver AttackResolver
+@inject AttackCoordinator AttackResolver
+@inject ShipGenerator ShipGenerator
 
 <div id="battlebox" class="d-flex justify-content-between m-auto p-2">
 
@@ -11,9 +12,9 @@
     <div class="flex-column text center">
         <h5 class="strong">Combat Results</h5>
         <br />
-        @if (Defender.Damage.CombatResults is not null)
+        @if (Defender.Damage.CombatLog is not null)
         {
-            @foreach (var message in Defender.Damage.CombatResults)
+            @foreach (var message in Defender.Damage.CombatLog)
             {
                 <p>@message</p>
             }
@@ -22,7 +23,9 @@
 
     @* Defender Ship *@
     <ShipTile Ship="Defender"></ShipTile>
+
 </div>
+
 <div id="buttonbox" class="text-center mb-1 ">
 
     @if (!isResolved)

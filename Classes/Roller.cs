@@ -8,7 +8,9 @@ namespace PacificBattle.Classes
 
         public List<int> Roll(int rolls)
         {
-            List<int> results = new();
+            Log.Information("");
+            Log.Information("New Roll with {rolls}", rolls);
+            List<int> results = [];
 
             for (int i = 0; i < rolls; i++)
             {
@@ -19,6 +21,7 @@ namespace PacificBattle.Classes
             {
                 Log.Information(result.ToString());
             }
+            Log.Information("");
             return results;
         }
     }
