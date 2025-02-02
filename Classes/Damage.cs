@@ -14,6 +14,7 @@ namespace PacificBattle.Classes
         {
             int damage = 0;
             int damageHits = 0;
+            CombatLog.Clear();
 
             foreach (var result in results)
             {
@@ -38,7 +39,7 @@ namespace PacificBattle.Classes
             CombatLog.Add(damageHits + " damage hits");
 
             // Roll for damage
-            var damageRolls = Roller.RollDamage(damageHits);
+            damage = Roller.RollDamage(damageHits);
 
             TotalDamage += damage;
             CombatLog.Add(damage + " damage taken");

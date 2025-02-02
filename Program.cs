@@ -31,8 +31,8 @@ namespace PacificBattle
                 });
 
                 // Add Other Services
-                builder.Services.AddSingleton<Roller>();
-                builder.Services.AddSingleton<AttackResolver>();
+                //builder.Services.AddSingleton<AttackCoordinator>();
+                //builder.Services.AddSingleton<ShipGenerator>();
 
                 // Build
                 var app = builder.Build();
@@ -65,7 +65,7 @@ namespace PacificBattle
             }
             catch (Exception ex)
             {
-                Log.Information("Doh! Unexpected Termination!");
+                Log.Information(ex,"Doh! Unexpected Termination!");
             }
             finally
             {

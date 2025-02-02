@@ -2,14 +2,14 @@
 
 namespace PacificBattle.Classes
 {
-    public class AttackCoordinator
+    public static class AttackCoordinator
     {
-        public required CombatShip Target { get; set; }
+        public static CombatShip Target { get; set; } = new();
 
-        public List<int> Results { get; set; } = [];
+        public static List<int> Results { get; set; } = [];
 
 
-        public void ResolveAttack(int numberOfAttacks)
+        public static void ResolveAttack(int numberOfAttacks)
         {
             Results.Clear();
             Results = Roller.RollAttack(numberOfAttacks);
