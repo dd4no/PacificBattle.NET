@@ -1,50 +1,51 @@
-﻿namespace PacificBattle.Classes
+﻿using Serilog;
+
+namespace PacificBattle.Classes
 {
     public class Damage
     {
-        private readonly Roller roller = new();
-
         public int TotalHits { get; set; }
         public int TotalDamage { get; set; }
         public bool IsDisabled { get; set; }
 
-        public List<string> CombatResults { get; set; } = new();
+        public List<string> CombatLog { get; set; } = new();
 
         public void CalculateDamage(List<int> results)
         {
             int damage = 0;
-            int hits = 0;
+            int damageHits = 0;
+            CombatLog.Clear();
 
             foreach (var result in results)
             {
                 if (result == 6)
                 {
-                    CombatResults.Add("Hit!");
-                    hits++;
+                    CombatLog.Add("Hit!");
+                    damageHits++;
                 }
                 else if (result == 5)
                 {
-                    CombatResults.Add("Disabling Hit");
+                    CombatLog.Add("Disabling Hit");
                     IsDisabled = true;
                     TotalHits++;
+                    Log.Information("Disabled");
                 }
                 else
                 {
-                    CombatResults.Add("Miss");
+                    CombatLog.Add("Miss");
                 }
             }
-            TotalHits += hits;
-            CombatResults.Add(hits + " hits");
+            TotalHits += damageHits;
+            CombatLog.Add(damageHits + " damage hits");
 
             // Roll for damage
-            var damageRolls = roller.Roll(hits);
-            foreach (var roll in damageRolls)
-            {
-                damage += roll;
-            }
+            damage = Roller.RollDamage(damageHits);
 
             TotalDamage += damage;
-            CombatResults.Add(damage + " damage taken");
+            CombatLog.Add(damage + " damage taken");
+
+            Log.Information("{damage} taken", damage);
+            Log.Information("{damage} total", TotalDamage);
         }
     }
 }

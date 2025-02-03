@@ -1,6 +1,5 @@
 ﻿@page "/battlebox"
 @inject AppDbContext db
-@inject AttackResolver AttackResolver
 
 <div id="battlebox" class="d-flex justify-content-between m-auto p-2">
 
@@ -11,9 +10,9 @@
     <div class="flex-column text center">
         <h5 class="strong">Combat Results</h5>
         <br />
-        @if (Defender.Damage.CombatResults is not null)
+        @if (Defender.Damage.CombatLog is not null)
         {
-            @foreach (var message in Defender.Damage.CombatResults)
+            @foreach (var message in Defender.Damage.CombatLog)
             {
                 <p>@message</p>
             }
@@ -22,7 +21,11 @@
 
     @* Defender Ship *@
     <ShipTile Ship="Defender"></ShipTile>
+    <p>@Message</p>
+    <p>Total Damage: @Defender.Damage.TotalDamage</p>
+
 </div>
+
 <div id="buttonbox" class="text-center mb-1 ">
 
     @if (!isResolved)
@@ -40,10 +43,10 @@
 
 <style>
     #battlebox {
-        background-color: cyan;
+    background-color: cyan;
     }
     #buttonbox {
-        background-color: gray;
+    background-color: gray;
     }
 </style>
 
@@ -66,55 +69,41 @@
         Japan = db.Ships.Where(x => x.NavyId == 2).ToList();
         GetShips();
     } 
-    
+
     private void GetShips()
     {
-        isResolved = false;
-        Message = string.Empty;
-        var randomAttackShipIndex = random.Next(Japan.Count+1);
-        var randomDefenderShipIndex = random.Next(Allies.Count+1);
+        Reset();
 
-        Attacker = new CombatShip 
-        {
-            ShipName = Japan[randomAttackShipIndex].ShipName!,
-            NavyId = Japan[randomAttackShipIndex].NavyId,
-            Attack = Japan[randomAttackShipIndex].Attack,
-            Armor = Japan[randomAttackShipIndex].Armor,
-            Speed = Japan[randomAttackShipIndex].Speed,
-            Airstrike = Japan[randomAttackShipIndex].Airstrike,
-            HasAttackBonus = Japan[randomAttackShipIndex].HasAttackBonus,
-            EndTurn = Japan[randomAttackShipIndex].EndTurn,
-            Damage = new(),
-        };
+        var japan = Japan[random.Next(Japan.Count)];
+        Attacker = Shipyard.BuildShip(japan);
 
-        Defender = new CombatShip
-        {
-            ShipName = Allies[randomDefenderShipIndex].ShipName!,
-            NavyId = Allies[randomDefenderShipIndex].NavyId,
-            Attack = Allies[randomDefenderShipIndex].Attack,
-            Armor = Allies[randomDefenderShipIndex].Armor,
-            Speed = Allies[randomDefenderShipIndex].Speed,
-            Airstrike = Allies[randomDefenderShipIndex].Airstrike,
-            HasAttackBonus = Allies[randomDefenderShipIndex].HasAttackBonus,
-            EndTurn = Allies[randomDefenderShipIndex].EndTurn,
-            Damage = new(),
-        };
+        var allies = Allies[random.Next(Allies.Count)];
+        Defender = Shipyard.BuildShip(allies);
+
     }
 
     private void StartCombat()
     {
-        AttackResolver.Target = Defender;
-        Message = string.Empty;
-        AttackResolver.ResolveAttack(Attacker.Attack);
+        Reset();
+        AttackCoordinator.Target = Defender;
+       
+        AttackCoordinator.ResolveAttack(Attacker.Attack);
+
         if (Defender.Damage.IsDisabled)
         {
             Message = "Ship has been disabled!";
             isResolved = true;
         };
-        if (Defender.IsDestroyed)
+        if (Defender.IsSunk)
         {
-            Message = "Ship has been destroyed!";
+            Message = "Ship has been sunk!";
             isResolved = true;
         };
+    }
+
+    private void Reset()
+    {
+        Message = string.Empty;
+        isResolved = false;
     }
 }

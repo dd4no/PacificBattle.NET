@@ -4,7 +4,7 @@
 
     <h4 class="text-center">Select Number</h4>
 
-    <InputSelect class="form-select w-25 m-auto" @bind-Value="numberSelected">
+    <InputSelect class="form-select w-25 m-auto" @bind-Value="NumberSelected">
         @foreach (var choice in choices)
         {
             <option value="@choice">@choice</option>
@@ -13,6 +13,6 @@
 </div>
 @code 
 {
-    public int numberSelected { get; set; }
+    public int NumberSelected { get; set; }
     private List<int> choices = new List<int> { 1, 2, 3, 4, 5, 6 };
 }
