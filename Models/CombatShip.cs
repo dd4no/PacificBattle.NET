@@ -17,7 +17,7 @@ namespace PacificBattle.Models
         public int Airstrike { get; set; }
         public bool HasAttackBonus { get; set; }
 
-        public Damage Damage { get; set; } = new();
+        public ShipDamage Damage { get; set; } = new();
         public bool IsSunk => Damage.TotalDamage >= Armor;
 
         public Location Location { get; set; } = new();

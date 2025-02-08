@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using PacificBattle.Classes;
 using PacificBattle.Components;
 using PacificBattle.Data;
+using PacificBattle.Interfaces;
+using PacificBattle.Managers;
 using Serilog;
 
 namespace PacificBattle
@@ -23,16 +24,24 @@ namespace PacificBattle
                 builder.Services.AddRazorComponents()
                     .AddInteractiveServerComponents();
 
-                // Register Db
+                // Add Controllers
+                builder.Services.AddControllers();
+
+                // Add Other Services
+                builder.Services.AddSingleton<IFleetManager, FleetManager>();
+
+                // Add HttpClient
+                builder.Services.AddHttpClient<IFleetManager, FleetManager> (client =>
+                {
+                    client.BaseAddress = new Uri("https://localhost:7156");
+                });
+
+                // Add DbContext
                 builder.Services.AddDbContext<AppDbContext>(options =>
                 {
                     var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
                     options.UseSqlite($"Data Source={dbPath}");
                 });
-
-                // Add Other Services
-                //builder.Services.AddSingleton<AttackCoordinator>();
-                //builder.Services.AddSingleton<ShipGenerator>();
 
                 // Build
                 var app = builder.Build();
@@ -57,6 +66,8 @@ namespace PacificBattle
 
                 app.MapRazorComponents<App>()
                     .AddInteractiveServerRenderMode();
+
+                app.MapControllers();
 
                 Log.Information("Starting...");
                 Log.Information("");

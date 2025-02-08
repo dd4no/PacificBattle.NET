@@ -1,42 +1,52 @@
-﻿@page "/battlebox"
-@inject AppDbContext db
+﻿@page "/"
+@using PacificBattle.Interfaces
+@inject IFleetManager fm
 
-<div id="battlebox" class="d-flex justify-content-between m-auto p-2">
+<div>
 
-    @* Attack Ship *@
-    <ShipTile Ship="Attacker"></ShipTile>
+    <div id="battlebox" class="d-flex justify-content-between m-auto p-2">
 
-    @* Combat Results *@
-    <div class="flex-column text center">
-        <h5 class="strong">Combat Results</h5>
-        <br />
-        @if (Defender.Damage.CombatLog is not null)
-        {
-            @foreach (var message in Defender.Damage.CombatLog)
-            {
-                <p>@message</p>
-            }
-        }
+        @* Attack Ship *@
+        <div class="flex-column text-center">
+            <ShipTile Ship="Attacker"></ShipTile>
+            <p>Total Damage: @Attacker.Damage.TotalDamage</p>
+        </div>
+
+        @* Combat Results *@
+        <div class="flex-column">
+            <h5 class=""><b>Combat Results</b></h5>
+            <h6 class="">@Message</h6>
+            <div class="text-center">
+                @foreach (var log in Defender.Damage.DamageLogs)
+                {
+                    <p>@log</p>
+                }
+                <p>@Status</p>
+            </div>
+        </div>
+
+        @* Defender Ship *@
+        <div class="flex-column text-center">
+            <ShipTile Ship="Defender"></ShipTile>
+            <p>Total Damage: @Defender.Damage.TotalDamage</p>
+        </div>
+
     </div>
 
-    @* Defender Ship *@
-    <ShipTile Ship="Defender"></ShipTile>
-    <p>@Message</p>
-    <p>Total Damage: @Defender.Damage.TotalDamage</p>
+    <div id="buttonbox" class="d-flex justify-content-between p-2">
 
-</div>
-
-<div id="buttonbox" class="text-center mb-1 ">
-
-    @if (!isResolved)
-    {
-        <div>
-            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat"><b>FIRE!</b></button>
+        <div class="p-1">
+            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@(isResolved)"><b>Attack</b></button>
         </div>
-    }
 
-    <div>
-        <button class="btn btn-success m-4 p-4" @onclick="GetShips"><b>Get Ships</b></button>
+        <div class="p-1">
+            <button class="btn btn-success m-4 p-4" @onclick="GetShips" hidden="@(!isResolved)"><b>Get Ships</b></button>
+        </div>
+
+@*         <div class="p-1">
+            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@isFirstRound"><b>Attack</b></button>
+        </div>
+ *@
     </div>
 
 </div>
@@ -52,58 +62,66 @@
 
 @code 
 {
-    private static readonly Random random = new Random();
-
-    private List<Ship> Allies { get; set; } = new();
-    private List<Ship> Japan { get; set; } = new();
+    private bool isResolved;
+    private bool isFirstRound;
 
     public CombatShip Attacker { get; set; } = new();
     public CombatShip Defender { get; set; } = new();
+    public string Status { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
-
-    private bool isResolved = false;
 
     protected override void OnInitialized()
     {
-        Allies = db.Ships.Where(x => x.NavyId == 1 || x.NavyId == 3 || x.NavyId == 4).ToList();
-        Japan = db.Ships.Where(x => x.NavyId == 2).ToList();
         GetShips();
     } 
+
+    private void Reset()
+    {
+        Status = string.Empty;
+        Message = string.Empty;
+        isFirstRound = true;
+        isResolved = false;
+    }
 
     private void GetShips()
     {
         Reset();
-
-        var japan = Japan[random.Next(Japan.Count)];
-        Attacker = Shipyard.BuildShip(japan);
-
-        var allies = Allies[random.Next(Allies.Count)];
-        Defender = Shipyard.BuildShip(allies);
-
+        Attacker = fm.BuildRandomShip(2);
+        Defender = fm.BuildRandomShip(1);
     }
 
     private void StartCombat()
     {
-        Reset();
-        AttackCoordinator.Target = Defender;
-       
-        AttackCoordinator.ResolveAttack(Attacker.Attack);
-
-        if (Defender.Damage.IsDisabled)
-        {
-            Message = "Ship has been disabled!";
-            isResolved = true;
-        };
-        if (Defender.IsSunk)
-        {
-            Message = "Ship has been sunk!";
-            isResolved = true;
-        };
+        Message = $"{Attacker.ShipName} attacks {Defender.ShipName}";
+        Attack(Attacker, Defender);
+        if (isFirstRound) { Swap(); }
+        isFirstRound = false;
     }
 
-    private void Reset()
+    private void Attack(CombatShip attacker, CombatShip target)
     {
-        Message = string.Empty;
-        isResolved = false;
+        AttackCoordinator.Target = target;
+        AttackCoordinator.ResolveAttack(attacker.Attack);
+        DetermineStatus(target);
+    }
+
+    private void DetermineStatus(CombatShip target)
+    {
+        if (target.Damage.IsDisabled)
+        {
+            Status = $"{target.ShipName} has been disabled!";
+        };
+        if (target.IsSunk)
+        {
+            Status = $"{target.ShipName} has been sunk!";
+        };
+        isResolved = isFirstRound ? false : true;
+    }
+
+    private void Swap(){
+        Defender.Damage.DamageLogs.Clear();
+        CombatShip temp = Attacker;
+        Attacker = Defender;
+        Defender = temp;
     }
 }
