@@ -11,10 +11,7 @@ namespace PacificBattle.Classes
 
         public static DamageReport Assess(List<int> results)
         {
-            damage = 0;
-            hits = 0;
-            isDisabled = false;
-            combatLogs.Clear();
+            NewDamageReport();
 
             foreach (var result in results)
             {
@@ -23,23 +20,24 @@ namespace PacificBattle.Classes
                     combatLogs.Add("Hit!");
                     hits++;
                 }
-                else if (result == 5)
+                if (result == 5)
                 {
                     combatLogs.Add("Disabling Hit");
                     isDisabled = true;
                     Log.Information("Disabled");
                 }
-                else
-                {
-                    combatLogs.Add("Miss");
-                }
             }
 
-            combatLogs.Add($"{hits} hits.");
-
-            damage = DamageRoller.Roll(hits);
-
-            combatLogs.Add($"{damage} taken.");
+            if (hits > 0)
+            {
+                combatLogs.Add($"{hits} hits.");
+                damage = DamageRoller.Roll(hits);
+                combatLogs.Add($"{damage} taken.");
+            }
+            else
+            {
+                combatLogs.Add("Missed");
+            }
 
             return new DamageReport
             {
@@ -48,6 +46,14 @@ namespace PacificBattle.Classes
                 IsDisabled = isDisabled,
                 CombatLogs = combatLogs
             };
+        }
+
+        private static void NewDamageReport()
+        {
+            damage = 0;
+            hits = 0;
+            isDisabled = false;
+            combatLogs.Clear();
         }
     }
 }
