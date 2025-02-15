@@ -12,7 +12,7 @@ namespace PacificBattle.Classes
                 NavyId = ship.NavyId,
                 EndTurn = ship.EndTurn,
                 ShipName = ship.ShipName ?? string.Empty,
-                Attack = ship.Attack,
+                Guns = ship.Attack,
                 Armor = ship.Armor,
                 Airstrike = ship.Airstrike,
                 HasAttackBonus = ship.HasAttackBonus,

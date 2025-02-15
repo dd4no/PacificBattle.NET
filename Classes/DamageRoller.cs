@@ -10,16 +10,19 @@ namespace PacificBattle.Classes
         public static int Roll(int hits)
         {
             Log.Information("");
-            Log.Information("New Damage Roll for {hits} hits", hits);
+            Log.Information(">>>>> Damage <<<<<");
 
-            int damage = 0;
+            int totalDamage = 0;
             for (int i = 0; i < hits; i++)
             {
-                damage += random.Next(1, 7);
+                var r = random.Next(1, 7);
+                totalDamage += r;
+                Log.Information("{r}", r);
             }
-            Log.Information("{damage} damage", damage);
+            Log.Information("total damage: {totalDamage}", totalDamage);
+            Log.Information("<<<<< >>>>");
 
-            return damage;
+            return totalDamage;
         }
     }
 }

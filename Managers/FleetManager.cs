@@ -32,7 +32,7 @@ namespace PacificBattle.Managers
             BuildCombatShips(arrivingShips);
         }
 
-        public CombatShip BuildRandomShip(int navy)
+        public CombatShip BuildRandomShipByNavy(int navy)
         {
             var navalShips = _http.GetFromJsonAsync<List<Ship>>($"GetTestShipsByNavy/{navy}").Result ?? [];
             int randomIndex = _random.Next(1, navalShips.Count);

@@ -11,8 +11,8 @@ namespace PacificBattle.Classes
         {
             Results.Clear();
             Results = AttackRoller.Roll(guns);
-            var report = DamageAssessor.Assess(Results);
-            Target.Damage.Take(report);
+            var damageReport = DamageAssessor.Assess(Results);
+            Target.Damage.Take(damageReport);
         }
     }
 }
