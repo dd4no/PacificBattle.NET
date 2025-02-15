@@ -11,7 +11,7 @@ namespace PacificBattle.Models
 
         public string ShipName { get; set; } = string.Empty;
 
-        public int Attack { get; set; }
+        public int Guns { get; set; }
         public int Armor { get; set; }
         public int Speed { get; set; }
         public int Airstrike { get; set; }

@@ -7,7 +7,6 @@ namespace PacificBattle.Classes
         public int LifetimeHits { get; set; }
         public int TotalDamage { get; set; }
         public bool IsDisabled { get; set; }
-
         public List<string> DamageLogs { get; set; } = new();
 
         public void Take(DamageReport report)

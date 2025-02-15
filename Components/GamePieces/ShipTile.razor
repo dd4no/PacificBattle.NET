@@ -1,7 +1,7 @@
 ﻿<div class="text-center shipTile @color">
     <h3 class="strong">@Ship.ShipName</h3>
     <div class="d-flex justify-content-between">
-        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Attack</p>
+        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Guns</p>
         <p class="">@Ship.Armor</p>
         <p class="">@Ship.Speed</p>
         @if (Ship.Airstrike != 0)
@@ -53,18 +53,23 @@
         string color = string.Empty;
         switch (navyId)
         {
+            // US
             case 1:
                 color = "blue";
                 break;
+            // Japanese
             case 2:
                 color = "red";
                 break;
+            // British
             case 3:
                 color = "green";
                 break;
+            // Dutch + Austrailian
             case 4:
                 color = "yellow";
                 break;
+
             default:
                 color = string.Empty;
                 break;

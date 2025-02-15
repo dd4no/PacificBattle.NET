@@ -76,11 +76,10 @@ namespace PacificBattle
             }
             catch (Exception ex)
             {
-                Log.Information(ex,"Doh! Unexpected Termination!");
+                Log.Fatal(ex, "Doh! Unexpected Termination! ... Exiting ... Buh-bye.");
             }
             finally
             {
-                Log.Information("... Exiting.");
                 Log.CloseAndFlush();
             }
         }

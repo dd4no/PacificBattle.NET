@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using PacificBattle.Interfaces
+@using PacificBattle.Components.GamePieces
 @inject IFleetManager fm
 
 <div>
@@ -17,7 +18,7 @@
             <h5 class=""><b>Combat Results</b></h5>
             <h6 class="">@Message</h6>
             <div class="text-center">
-                @foreach (var log in Defender.Damage.DamageLogs)
+                @foreach (var log in Target.Damage.DamageLogs)
                 {
                     <p>@log</p>
                 }
@@ -27,8 +28,8 @@
 
         @* Defender Ship *@
         <div class="flex-column text-center">
-            <ShipTile Ship="Defender"></ShipTile>
-            <p>Total Damage: @Defender.Damage.TotalDamage</p>
+            <ShipTile Ship="Target"></ShipTile>
+            <p>Total Damage: @Target.Damage.TotalDamage</p>
         </div>
 
     </div>
@@ -43,10 +44,6 @@
             <button class="btn btn-success m-4 p-4" @onclick="GetShips" hidden="@(!isResolved)"><b>Get Ships</b></button>
         </div>
 
-@*         <div class="p-1">
-            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@isFirstRound"><b>Attack</b></button>
-        </div>
- *@
     </div>
 
 </div>
@@ -66,7 +63,7 @@
     private bool isFirstRound;
 
     public CombatShip Attacker { get; set; } = new();
-    public CombatShip Defender { get; set; } = new();
+    public CombatShip Target { get; set; } = new();
     public string Status { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
 
@@ -86,14 +83,17 @@
     private void GetShips()
     {
         Reset();
-        Attacker = fm.BuildRandomShip(2);
-        Defender = fm.BuildRandomShip(1);
+        Attacker = fm.BuildRandomShipByNavy(2);
+        Target = fm.BuildRandomShipByNavy(1);
     }
 
     private void StartCombat()
     {
-        Message = $"{Attacker.ShipName} attacks {Defender.ShipName}";
-        Attack(Attacker, Defender);
+        Message = $"{Attacker.ShipName} attacks {Target.ShipName}";
+        Log.Information("");
+        Log.Information("********** Attack! **********");
+        Log.Information("{attacker} vs {target}", Attacker.ShipName, Target.ShipName);
+        Attack(Attacker, Target);
         if (isFirstRound) { Swap(); }
         isFirstRound = false;
     }
@@ -101,7 +101,7 @@
     private void Attack(CombatShip attacker, CombatShip target)
     {
         AttackCoordinator.Target = target;
-        AttackCoordinator.ResolveAttack(attacker.Attack);
+        AttackCoordinator.ResolveAttack(attacker.Guns);
         DetermineStatus(target);
     }
 
@@ -110,18 +110,24 @@
         if (target.Damage.IsDisabled)
         {
             Status = $"{target.ShipName} has been disabled!";
+            Log.Information("{ship} disabled", target.ShipName);
+            Log.Information("");
+
         };
         if (target.IsSunk)
         {
             Status = $"{target.ShipName} has been sunk!";
+            Log.Information("{ship} sunk", target.ShipName);
+            Log.Information("");
         };
         isResolved = isFirstRound ? false : true;
+            Log.Information("********** **********");
     }
 
     private void Swap(){
-        Defender.Damage.DamageLogs.Clear();
+        Target.Damage.DamageLogs.Clear();
         CombatShip temp = Attacker;
-        Attacker = Defender;
-        Defender = temp;
+        Attacker = Target;
+        Target = temp;
     }
 }

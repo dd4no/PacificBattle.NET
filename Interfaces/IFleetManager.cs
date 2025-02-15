@@ -7,7 +7,7 @@ namespace PacificBattle.Interfaces
         List<CombatShip> ActiveShips { get; set; }
         List<CombatShip> SunkShips { get; set; }
 
-        CombatShip BuildRandomShip(int navy);
+        CombatShip BuildRandomShipByNavy(int navy);
         void ChangeTurns(int turn);
     }
 }
