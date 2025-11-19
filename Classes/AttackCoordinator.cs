@@ -9,7 +9,6 @@ namespace PacificBattle.Classes
 
         public static void ResolveAttack(int guns)
         {
-            Results.Clear();
             Results = AttackRoller.Roll(guns);
             var damageReport = DamageAssessor.Assess(Results);
             Target.Damage.Take(damageReport);

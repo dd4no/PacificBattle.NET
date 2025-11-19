@@ -1,28 +1,34 @@
-﻿namespace PacificBattle.Managers
+﻿
+namespace PacificBattle.Managers
 {
     public class TurnManager
     {
         private GameManager gm;
-        private FleetManager fleetManager;
+        private FleetManager fm;
+        private BaseManager bm;
+        private SeaManager sm;
 
         public int Turn { get; private set; } = 1;
         public int POC { get; }
 
-        public TurnManager(GameManager gmgr, FleetManager fmgr)
+
+        public TurnManager(GameManager gmgr, FleetManager fmgr, BaseManager bmgr, SeaManager smgr)
         {
             gm = gmgr;
-            fleetManager = fmgr;
+            fm = fmgr;
+            bm = bmgr;
+            sm = smgr;
         }
 
         public void StartTurnOne()
         {
-            fleetManager.ChangeTurns(1);
+            fm.ChangeTurns(1);
         }
 
         private void StartNewTurn()
         {
             Turn++;
-            fleetManager.ChangeTurns(Turn);
+            fm.ChangeTurns(Turn);
         }
 
         // activate/deactivate ships

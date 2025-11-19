@@ -5,7 +5,7 @@ namespace PacificBattle.Models
     public class CombatShip
     {
         public int ShipId { get; set; }
-        public string Type { get; set; } = string.Empty;
+        public string ShipClass { get; set; } = string.Empty;
         public int NavyId { get; set; }
         public int EndTurn { get; set; }
 
@@ -19,6 +19,7 @@ namespace PacificBattle.Models
 
         public ShipDamage Damage { get; set; } = new();
         public bool IsSunk => Damage.TotalDamage >= Armor;
+        public string Status { get; set; } = string.Empty;
 
         public Location Location { get; set; } = new();
     }

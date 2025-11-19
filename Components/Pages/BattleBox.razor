@@ -1,6 +1,4 @@
 ﻿@page "/"
-@using PacificBattle.Interfaces
-@using PacificBattle.Components.GamePieces
 @inject IFleetManager fm
 
 <div>
@@ -121,7 +119,7 @@
             Log.Information("");
         };
         isResolved = isFirstRound ? false : true;
-            Log.Information("********** **********");
+        Log.Information("********** **********");
     }
 
     private void Swap(){

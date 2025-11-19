@@ -1,18 +1,17 @@
-﻿namespace PacificBattle.Managers
+﻿using PacificBattle.Models;
+
+namespace PacificBattle.Managers
 {
     public class SeaManager
     {
-        private GameManager gm;
-        private FleetManager fleetManager;
-        private TurnManager turnManager;
+        public Dictionary<int, List<CombatShip>> UnitsAtSea = [];
+        public Dictionary<int, List<CombatShip>> UnitsInPort = [];
 
-        public SeaManager(GameManager gmgr, FleetManager fmgr, TurnManager tmgr)
+        private Dictionary<int, int> seaAccess = [];
+        public SeaManager()
         {
-            gm = gmgr;
-            fleetManager = fmgr;
-            turnManager = tmgr;
+            
         }
-
         // What Ships are in what areas
 
         // What bases touch what sea areas

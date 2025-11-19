@@ -35,7 +35,8 @@ namespace PacificBattle.Managers
         public CombatShip BuildRandomShipByNavy(int navy)
         {
             var navalShips = _http.GetFromJsonAsync<List<Ship>>($"GetTestShipsByNavy/{navy}").Result ?? [];
-            int randomIndex = _random.Next(1, navalShips.Count);
+            if (navalShips.Count == 0) return new();
+            int randomIndex = _random.Next(0, navalShips.Count);
             Ship ship = navalShips[randomIndex];
             return BuildCombatShip(ship);
         }
@@ -44,7 +45,6 @@ namespace PacificBattle.Managers
         {
             return Shipyard.BuildShip(ship);
         }
-
 
         private void BuildCombatShips(List<Ship> ships)
         {
@@ -56,14 +56,12 @@ namespace PacificBattle.Managers
 
         private void RemoveShipsByTurn(int turn)
         {
-            foreach (var ship in ActiveShips)
+            var removed = ActiveShips.Where(x => x.EndTurn == turn).ToList();
+            foreach (var ship in removed)
             {
-                if (ship.EndTurn == turn)
-                {
-                    ActiveShips.Remove(ship);
-                    Log.Information("{ship} Removed.", ship.ShipName);
-                }
+                Log.Information("{ship} Removed.", ship.ShipName);
             }
+            ActiveShips.RemoveAll(x => x.EndTurn == turn);
         }
     }
 }

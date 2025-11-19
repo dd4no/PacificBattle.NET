@@ -20,7 +20,7 @@ namespace PacificBattle.Classes
                     combatLogs.Add("Hit!");
                     hits++;
                 }
-                if (result == 5)
+                else if (result == 5)
                 {
                     combatLogs.Add("Disabling Hit");
                     isDisabled = true;
@@ -50,7 +50,6 @@ namespace PacificBattle.Classes
             }
             else if (!isDisabled)
             {
-                combatLogs.Add("Missed");
                 Log.Information("Missed");
             }
 

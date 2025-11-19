@@ -1,37 +1,75 @@
-﻿<div class="text-center shipTile @color">
-    <h3 class="strong">@Ship.ShipName</h3>
-    <div class="d-flex justify-content-between">
-        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Guns</p>
+﻿@* Ship Tile Component *@
+
+<div class="text-center shipTile @color p-1">
+
+    @if (hasAirstrike)
+    {
+        <div class="airstrikeBox d-flex align-items-center justify-content-end mt-2 p-1">
+            <p class="pt-1 pe-3 pb-1 ps-3 @hasBonus ? bonus : string.Empty">@Ship.Airstrike</p>
+        </div>
+    }
+    else 
+    {
+        <div class="airstrikeBox m-1 p-1"></div>
+    }
+
+    <h3 class="m-1 p-1"><b>@Ship.ShipName</b></h3>
+
+    <div class="d-flex align-items-center justify-content-between m-4 p-4">
+        <p class="pt-1 pe-3 pb-1 ps-3 @hasBonus ? bonus : string.Empty">@Ship.Guns</p>
         <p class="">@Ship.Armor</p>
         <p class="">@Ship.Speed</p>
-        @if (Ship.Airstrike != 0)
-        {
-            <p>@Ship.Airstrike</p>
-        }
     </div>
+
+    <div id="statusBar" class="">
+        <p>@Ship.ShipClass</p>
+        <p>@Ship.Status</p>
+    </div>
+
 </div>
 
 <style>
     .shipTile {
-        width: 500px;
-        height: 500px;
-        margin: 2rem;
-        padding: 2rem;
-        border: 2px solid black;
+    width: 500px;
+    height: 500px;
+    margin: 2rem;
+    padding: 2rem;
+    border: 2px solid black;
+    border-radius: 5px;
+    box-shadow: 5px 2px gray;
+    font-size: 1.5rem;
     }
 
+    /* US */
     .blue {
     background-color: blue;
     color: white;
     }
+    /* Japanese */
     .red {
     background-color: red;
     }
+    /* British */
     .green {
     background-color: green;
     }
+    /* Dutch and Austrailian */
     .yellow {
     background-color: yellow;
+    }
+
+    .airstrikeBox {
+        height: 10%;
+    }
+
+    .bonus {
+        border: 1px solid white;
+        border-radius: 100%;
+    }
+    
+    #statusBar {
+        position: relative;
+        bottom: 10px;
     }
 </style>
 
@@ -41,11 +79,14 @@
     public CombatShip Ship { get; set; } = new();
 
     private string color = string.Empty;
+    private bool hasBonus;
+    private bool hasAirstrike;
 
     protected override void OnParametersSet()
     {
         color = SetColor(Ship.NavyId);
-        StateHasChanged();
+        if (Ship.Airstrike > 0) { hasAirstrike = true; };
+        if (Ship.HasAttackBonus) { hasBonus = true; };
     }
 
     private string SetColor(int navyId)

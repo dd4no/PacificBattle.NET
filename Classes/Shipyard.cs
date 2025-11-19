@@ -9,17 +9,20 @@ namespace PacificBattle.Classes
         {
             var newShip = new CombatShip
             {
+                ShipId = ship.ShipId,
+                ShipClass = DetermineShipClass(ship),
                 NavyId = ship.NavyId,
                 EndTurn = ship.EndTurn,
-                ShipName = ship.ShipName ?? string.Empty,
+                ShipName = ship.ShipName,
                 Guns = ship.Attack,
                 Armor = ship.Armor,
                 Airstrike = ship.Airstrike,
                 HasAttackBonus = ship.HasAttackBonus,
                 Damage = new(),
+                Status = "Active",
                 Location = new()
             };
-            if (ship.LocationGroup is not null && ship.LocationGroup != "A")
+            if (ship.LocationGroup != "A")
             {
                 newShip.Location.LocationGroup = ship.LocationGroup;
             }
@@ -36,6 +39,24 @@ namespace PacificBattle.Classes
                 fleet.Add(newship);
             }
             return fleet;
+        }
+
+        private static string DetermineShipClass(Ship ship)
+        {
+            var shipClass = string.Empty;
+            if (ship.Airstrike > 0)
+            {
+                shipClass = "Aircraft Carrier";
+            }
+            else if (ship.Attack > 1)
+            {
+                shipClass = "Battleship";
+            }
+            else
+            {
+                shipClass = "Cruiser";
+            }
+            return shipClass;
         }
     }
 }

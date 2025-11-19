@@ -1,0 +1,15 @@
+﻿@page "/sea-area"
+
+@code 
+{
+    [Parameter]
+    public int SeaId { get; set; }
+
+    public List<CombatShip> Japan { get; set; } = [];
+    public List<CombatShip> Allies { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+}
