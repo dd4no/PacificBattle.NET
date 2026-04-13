@@ -16,13 +16,13 @@
 
         public void StartTurnOne()
         {
-            fleetManager.ChangeTurns(1);
+            //fleetManager.ChangeTurns(1);
         }
 
         private void StartNewTurn()
         {
             Turn++;
-            fleetManager.ChangeTurns(Turn);
+            //fleetManager.ChangeTurns(Turn);
         }
 
         // activate/deactivate ships

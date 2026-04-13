@@ -1,69 +1,71 @@
-﻿using PacificBattle.Classes;
+﻿using PacificBattle.Data;
 using PacificBattle.Data.ContextModels;
 using PacificBattle.Interfaces;
 using PacificBattle.Models;
-using Serilog;
 
 namespace PacificBattle.Managers
 {
-    public class FleetManager : IFleetManager
+    public class FleetManager(AppDbContext db, ILogger<FleetManager> logger) : IFleetManager
     {
-        private readonly static Random _random = new();
-        private readonly HttpClient _http;
-        private List<Ship> _allShips = [];
+        private readonly AppDbContext _db = db;
+        private readonly ILogger<FleetManager> _logger = logger;
 
-        public List<CombatShip> ActiveShips { get; set; } = [];
-        public List<CombatShip> SunkShips { get; set; } = [];
-
-        public FleetManager(HttpClient httpClient)
+        // Get All
+        public List<Ship> GetAllShips()
         {
-            _http = httpClient;
+            return _db.Ships.ToList();
         }
 
-        private async Task GetAllShips()
-        {
-            _allShips = await _http.GetFromJsonAsync<List<Ship>>("DBController/") ?? [];
-        }
-
-        public void ChangeTurns(int turn)
-        {
-            RemoveShipsByTurn(turn);
-            var arrivingShips = _allShips.Where(x => x.Turn == turn).ToList();
-            BuildCombatShips(arrivingShips);
-        }
-
+        // Get Random By Navy for testing
         public CombatShip BuildRandomShipByNavy(int navy)
         {
-            var navalShips = _http.GetFromJsonAsync<List<Ship>>($"GetTestShipsByNavy/{navy}").Result ?? [];
-            int randomIndex = _random.Next(1, navalShips.Count);
-            Ship ship = navalShips[randomIndex];
-            return BuildCombatShip(ship);
+            try
+            {
+                var navalShips = _db.Ships.Where(x => x.NavyId == navy).ToList();
+                int randomIndex = new Random().Next(1, navalShips.Count);
+                Ship ship = navalShips[randomIndex];
+                return BuildShip(ship);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Something went wrong. {ex}", ex);
+                return new();
+            }
         }
 
-        private CombatShip BuildCombatShip(Ship ship)
+        #region Shipyard
+        private static CombatShip BuildShip(Ship ship)
         {
-            return Shipyard.BuildShip(ship);
+            var newShip = new CombatShip
+            {
+                NavyId = ship.NavyId,
+                EndTurn = ship.EndTurn,
+                ShipName = ship.ShipName ?? string.Empty,
+                Guns = ship.Attack,
+                Armor = ship.Armor,
+                Airstrike = ship.Airstrike,
+                HasAttackBonus = ship.HasAttackBonus,
+                Damage = new(),
+                Location = new()
+            };
+            if (ship.LocationGroup is not null && ship.LocationGroup != "A")
+            {
+                newShip.Location.LocationGroup = ship.LocationGroup;
+            }
+
+            return newShip;
         }
 
-
-        private void BuildCombatShips(List<Ship> ships)
+        private static List<CombatShip> ComposeFleet(List<Ship> ships)
         {
+            List<CombatShip> fleet = [];
             foreach (var ship in ships)
             {
-                ActiveShips.Add(Shipyard.BuildShip(ship));
+                var newship = BuildShip(ship);
+                fleet.Add(newship);
             }
+            return fleet;
         }
-
-        private void RemoveShipsByTurn(int turn)
-        {
-            foreach (var ship in ActiveShips)
-            {
-                if (ship.EndTurn == turn)
-                {
-                    ActiveShips.Remove(ship);
-                    Log.Information("{ship} Removed.", ship.ShipName);
-                }
-            }
-        }
+        #endregion Shipyard
     }
 }

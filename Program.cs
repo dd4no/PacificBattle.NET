@@ -12,18 +12,12 @@ namespace PacificBattle
     {
         public static void Main(string[] args)
         {
-            // Configure Logger
-            var loggingConfiguration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .Build();
-
             // Initialize Bootstrap Logging
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .WriteTo.Console(outputTemplate: "{Timestamp: ddd-MMM-dd HH:mm:ss} [{Level:u3}] -- {Message}{NewLine}{Exception}")
                 .CreateBootstrapLogger();
-            Log.Information("Starting App...");
+            Log.Information("Running Pacific Battle...");
 
             try
             {
@@ -31,6 +25,7 @@ namespace PacificBattle
                 var builder = WebApplication.CreateBuilder(args);
 
                 // Replace Bootstrap Logger with Host Logger
+                builder.Logging.ClearProviders();
                 builder.Host.UseSerilog((hostingContext, services, loggerConfiguration) =>
                 {
                     // Configure Logger
@@ -39,8 +34,6 @@ namespace PacificBattle
                         .Enrich.FromLogContext();
                 },
                 preserveStaticLogger: false);
-                Log.Information("BootstrapLogger Replaced, Configuring App...");
-
 
                 // Add Razor
                 builder.Services.AddRazorComponents()
@@ -50,13 +43,7 @@ namespace PacificBattle
                 builder.Services.AddControllers();
 
                 // Register Services
-                builder.Services.AddSingleton<IFleetManager, FleetManager>();
-
-                // Add HttpClient
-                builder.Services.AddHttpClient<IFleetManager, FleetManager> (client =>
-                {
-                    client.BaseAddress = new Uri("https://localhost:7156");
-                });
+                builder.Services.AddScoped<IFleetManager, FleetManager>();
 
                 // Register DbContext
                 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -67,11 +54,8 @@ namespace PacificBattle
 
                 // Build App
                 var app = builder.Build();
-                Log.Information("Initializing...");
-                Log.Information("Application Built.");
 
                 // Configure HTTP request pipeline
-                app.UseSerilogRequestLogging();
 
                 if (!app.Environment.IsDevelopment())
                 {
@@ -89,17 +73,19 @@ namespace PacificBattle
 
                 app.MapControllers();
 
-                Log.Information("Starting...");
+                Log.Information("*****************************************");
+                Log.Information("Commencing battle");
                 Log.Information("");
 
                 app.Run();
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Doh! Unexpected Termination! ... Exiting ... Buh-bye.");
+                Log.Fatal(ex, "Whoops... Unexpected Termination... FUBAR ... Exiting ... Buh-bye.");
             }
             finally
             {
+                Log.Information("Closing Remarks");
                 Log.CloseAndFlush();
             }
         }

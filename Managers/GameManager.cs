@@ -25,7 +25,7 @@ namespace PacificBattle.Managers
         {
             Turn = 1;
             ActiveShips.Clear();
-            ActiveShips = fleetManager.ActiveShips;
+            //ActiveShips = fleetManager.ActiveShips;
             POC = 0;
             WinningSide = string.Empty;
             turnManager.StartTurnOne();
