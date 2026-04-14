@@ -1,108 +1,147 @@
 ﻿@page "/"
+@using PacificBattle.CombatResolution
 @using PacificBattle.Interfaces
 @using PacificBattle.Components.GamePieces
 @inject IFleetManager fm
 
-<div>
+<div id="page">
 
-    <div id="battlebox" class="d-flex justify-content-between m-auto p-2">
+    <div class="p-4">
 
-        @* Attack Ship *@
-        <div class="flex-column text-center">
-            <ShipTile Ship="Attacker"></ShipTile>
-            <p>Total Damage: @Attacker.Damage.TotalDamage</p>
-        </div>
+        <div id="topbar"></div>
 
-        @* Combat Results *@
-        <div class="flex-column">
-            <h5 class=""><b>Combat Results</b></h5>
-            <h6 class="">@Message</h6>
-            <div class="text-center">
-                @foreach (var log in Target.Damage.DamageLogs)
-                {
-                    <p>@log</p>
-                }
-                <p>@Status</p>
+        <div id="battlebox" class="d-flex justify-content-around p-4">
+
+            @* Attack Ship *@
+            <div class="flex-column text-center ms-4">
+                <ShipTile Ship="Aggressor"></ShipTile>
+                <p>Total Damage: @Aggressor.Damage.TotalDamage</p>
             </div>
+
+            @* Combat Results *@
+            <div class="flex-column">
+                <h5 class="text-center"><b>Combat Results</b></h5>
+                <br />
+                <h5>@BattleTitle</h5>
+                <br />
+                <h6 class="">@CombatMessage</h6>
+                <br />
+                <h6>@Status</h6>
+            </div>
+
+            @* Defender Ship *@
+            <div class="flex-column text-center me-4">
+                <ShipTile Ship="Defender"></ShipTile>
+                <p>Total Damage: @Defender.Damage.TotalDamage</p>
+            </div>
+
         </div>
 
-        @* Defender Ship *@
-        <div class="flex-column text-center">
-            <ShipTile Ship="Target"></ShipTile>
-            <p>Total Damage: @Target.Damage.TotalDamage</p>
-        </div>
+        <div id="buttonbox" class="d-flex justify-content-around p-4">
 
-    </div>
+            <div class="p-1">
+                <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" ><b>Attack</b></button>
+            </div>
 
-    <div id="buttonbox" class="d-flex justify-content-between p-2">
+            <div class="p-1">
+                <button class="btn btn-success m-4 p-4" @onclick="GetShips" hidden="@(!isReturnRound)"><b>Get Ships</b></button>
+            </div>
 
-        <div class="p-1">
-            <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@(isResolved)"><b>Attack</b></button>
-        </div>
-
-        <div class="p-1">
-            <button class="btn btn-success m-4 p-4" @onclick="GetShips" hidden="@(!isResolved)"><b>Get Ships</b></button>
         </div>
 
     </div>
 
 </div>
 
+
 <style>
+    #page {
+        height: 100vh;
+        margin: 0 auto;
+        background-color: black;
+    }
+    #topbar {
+        height: 15vh;
+        background-color: gray;
+    }
+
     #battlebox {
     background-color: cyan;
     }
+
     #buttonbox {
     background-color: gray;
     }
 </style>
 
+
 @code 
 {
-    private bool isResolved;
-    private bool isFirstRound;
+    // Combatants
+    public CombatShip Aggressor { get; set; } = new();
+    public CombatShip Defender { get; set; } = new();
 
-    public CombatShip Attacker { get; set; } = new();
-    public CombatShip Target { get; set; } = new();
+    // Display
+    public string BattleTitle { get; set; } = string.Empty;
+    public string CombatMessage { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
-    public string Message { get; set; } = string.Empty;
 
+    // Toggle Swap
+    private bool isReturnRound;
+
+    // Populate Battle
     protected override void OnInitialized()
     {
         GetShips();
     } 
 
-    private void Reset()
-    {
-        Status = string.Empty;
-        Message = string.Empty;
-        isFirstRound = true;
-        isResolved = false;
-    }
-
     private void GetShips()
     {
         Reset();
-        Attacker = fm.BuildRandomShipByNavy(2);
-        Target = fm.BuildRandomShipByNavy(1);
+        Aggressor = fm.BuildRandomShipByNavy(2);
+        Defender = fm.BuildRandomShipByNavy(1);
+        BattleTitle = $"{Aggressor.ShipName} vs. {Defender.ShipName}";
+        CombatMessage = $"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)";
+    }
+
+    private void Reset()
+    {
+        BattleTitle = string.Empty;
+        Status = string.Empty;
+        CombatMessage = string.Empty;
+        isReturnRound = false;
     }
 
     private void StartCombat()
     {
-        Message = $"{Attacker.ShipName} attacks {Target.ShipName}";
-        Log.Information("");
-        Log.Information("********** Attack! **********");
-        Log.Information("{attacker} vs {target}", Attacker.ShipName, Target.ShipName);
-        Attack(Attacker, Target);
-        if (isFirstRound) { Swap(); }
-        isFirstRound = false;
+
+        Task.Delay(100);
+
+        if (Aggressor.Guns != 0)
+        {
+            Attack(Aggressor.Guns, Defender);
+        }
+        else
+        {
+            CombatMessage = "Aircraft carrier has no guns to attack with.";            
+        }
+
+        if (!isReturnRound) 
+        {
+            CombatMessage = $"{Defender.ShipName} returns fire";
+            Task.Delay(100);
+            Swap(); 
+            CombatMessage = $"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)";
+        }
+        isReturnRound = !isReturnRound;
+        // StateHasChanged();
     }
 
-    private void Attack(CombatShip attacker, CombatShip target)
+    private void Attack(int guns, CombatShip target)
     {
         AttackCoordinator.Target = target;
-        AttackCoordinator.ResolveAttack(attacker.Guns);
-        DetermineStatus(target);
+        AttackCoordinator.ResolveAttack(guns);
+        DetermineStatus(Defender);
     }
 
     private void DetermineStatus(CombatShip target)
@@ -110,24 +149,17 @@
         if (target.Damage.IsDisabled)
         {
             Status = $"{target.ShipName} has been disabled!";
-            Log.Information("{ship} disabled", target.ShipName);
-            Log.Information("");
-
         };
         if (target.IsSunk)
         {
             Status = $"{target.ShipName} has been sunk!";
-            Log.Information("{ship} sunk", target.ShipName);
-            Log.Information("");
         };
-        isResolved = isFirstRound ? false : true;
-            Log.Information("********** **********");
     }
 
     private void Swap(){
-        Target.Damage.DamageLogs.Clear();
-        CombatShip temp = Attacker;
-        Attacker = Target;
-        Target = temp;
+        // Defender.Damage.DamageLogs.Clear();
+        CombatShip temp = Aggressor;
+        Aggressor = Defender;
+        Defender = temp;
     }
 }

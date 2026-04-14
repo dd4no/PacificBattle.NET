@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using PacificBattle.CombatResolution;
 
 namespace PacificBattle.Classes
 {
@@ -7,14 +7,17 @@ namespace PacificBattle.Classes
         public int LifetimeHits { get; set; }
         public int TotalDamage { get; set; }
         public bool IsDisabled { get; set; }
-        public List<string> DamageLogs { get; set; } = new();
+        public List<string> DamageLogs { get; set; } = [];
 
         public void Take(DamageReport report)
         {
             LifetimeHits += report.Hits;
             TotalDamage += report.Damage;
             IsDisabled = report.IsDisabled;
-            DamageLogs = report.CombatLogs;
+            foreach (var log in report.CombatLogs)
+            {
+                DamageLogs.Add(log);
+            }
         }
     }
 }
