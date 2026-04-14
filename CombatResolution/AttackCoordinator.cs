@@ -1,6 +1,7 @@
-﻿using PacificBattle.Models;
+﻿using PacificBattle.Classes;
+using PacificBattle.Models;
 
-namespace PacificBattle.Classes
+namespace PacificBattle.CombatResolution
 {
     public static class AttackCoordinator
     {
@@ -10,7 +11,7 @@ namespace PacificBattle.Classes
         public static void ResolveAttack(int guns)
         {
             Results.Clear();
-            Results = AttackRoller.Roll(guns);
+            Results = Roller.FireGuns(guns);
             var damageReport = DamageAssessor.Assess(Results);
             Target.Damage.Take(damageReport);
         }

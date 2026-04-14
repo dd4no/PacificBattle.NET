@@ -55,17 +55,6 @@ namespace PacificBattle.Managers
 
             return newShip;
         }
-
-        private static List<CombatShip> ComposeFleet(List<Ship> ships)
-        {
-            List<CombatShip> fleet = [];
-            foreach (var ship in ships)
-            {
-                var newship = BuildShip(ship);
-                fleet.Add(newship);
-            }
-            return fleet;
-        }
         #endregion Shipyard
     }
 }
