@@ -1,4 +1,4 @@
-﻿@page "/battlebox"
+﻿@page "/"
 @using PacificBattle.CombatResolution
 @using PacificBattle.Interfaces
 @inject ILogger<BattleBox> logger
@@ -112,41 +112,25 @@
     {
         if (Aggressor.Guns != 0)
         {
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");                  
             Attack(Aggressor.Guns, Defender);
             DetermineStatus(Defender);
         }
         else
         {
             BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
-            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
-            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
-            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
-            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
+                              
         }
 
         if (!isReturnRound) 
         {
-            BattleLogs.Add($"{Defender.ShipName} returns fire");
-            BattleLogs.Add($"{Defender.ShipName} returns fire");
-            BattleLogs.Add($"{Defender.ShipName} returns fire");
-            BattleLogs.Add($"{Defender.ShipName} returns fire");
-            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            BattleLogs.Add($"{Defender.ShipName} returns fire");            
             Swap();
             isReturnRound = true;
         }
         else
         {
-            BattleLogs.Add("Action complete");
-            BattleLogs.Add("Action complete");
-            BattleLogs.Add("Action complete");
-            BattleLogs.Add("Action complete");
-            BattleLogs.Add("Action complete");
-            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");            ;
             isResolved = true;
             foreach (var log in BattleLogs)
             {
