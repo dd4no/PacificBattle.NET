@@ -32,7 +32,7 @@ namespace PacificBattle.CombatResolution
             if (hits > 0)
             {
                 damage = Roller.RollDamage(hits);
-                combatLogs.Add($"{hits} taken for {damage} damage.");
+                combatLogs.Add($"{hits} hits taken for {damage} damage.");
             }
             if (hits == 0) 
             { 

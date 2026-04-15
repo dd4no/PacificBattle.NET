@@ -1,0 +1,28 @@
+﻿<div id="logbox" class="text-center">
+
+    <h5 class="text-center"><b>Combat Results</b></h5>
+
+    @foreach (var log in Messages)
+    {
+        <h6>@log</h6>
+    }
+
+</div>
+
+
+<style>
+    #logbox {
+        height: 90%;
+        width: 100%;
+        padding: .5rem;
+        border: 1px solid black;
+        border-radius: 10px;
+        overflow-y: auto;
+    }
+</style>
+
+
+@code 
+{
+    [Parameter] public List<string> Messages { get; set; } = [];
+}

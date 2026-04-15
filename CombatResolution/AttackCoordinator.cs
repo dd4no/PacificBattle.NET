@@ -1,5 +1,5 @@
 ﻿using PacificBattle.Classes;
-using PacificBattle.Models;
+using PacificBattle.Ships;
 
 namespace PacificBattle.CombatResolution
 {

@@ -1,6 +1,4 @@
-﻿using PacificBattle.Classes;
-
-namespace PacificBattle.Models
+﻿namespace PacificBattle.Ships
 {
     public class CombatShip
     {
@@ -20,6 +18,6 @@ namespace PacificBattle.Models
         public ShipDamage Damage { get; set; } = new();
         public bool IsSunk => Damage.TotalDamage >= Armor;
 
-        public Location Location { get; set; } = new();
+        public ShipLocation Location { get; set; } = new();
     }
 }

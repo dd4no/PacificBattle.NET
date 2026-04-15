@@ -1,6 +1,6 @@
 ﻿using PacificBattle.CombatResolution;
 
-namespace PacificBattle.Classes
+namespace PacificBattle.Ships
 {
     public class ShipDamage
     {
