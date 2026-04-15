@@ -80,7 +80,6 @@ namespace PacificBattle
             }
             finally
             {
-                Log.Information("Closing Remarks");
                 Log.CloseAndFlush();
             }
         }

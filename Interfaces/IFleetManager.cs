@@ -1,5 +1,5 @@
 ﻿using PacificBattle.Data.ContextModels;
-using PacificBattle.Models;
+using PacificBattle.Ships;
 
 namespace PacificBattle.Interfaces
 {

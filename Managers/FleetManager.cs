@@ -1,7 +1,7 @@
 ﻿using PacificBattle.Data;
 using PacificBattle.Data.ContextModels;
 using PacificBattle.Interfaces;
-using PacificBattle.Models;
+using PacificBattle.Ships;
 
 namespace PacificBattle.Managers
 {

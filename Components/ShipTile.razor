@@ -1,6 +1,8 @@
 ﻿
 <div class="text-center shipTile @color">
+
     <h3 class="strong">@Ship.ShipName</h3>
+
     <div class="d-flex justify-content-between">
         <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Guns</p>
         <p class="">@Ship.Armor</p>
@@ -10,7 +12,9 @@
             <p>@Ship.Airstrike</p>
         }
     </div>
+
 </div>
+
 
 <style>
     .shipTile {
@@ -35,6 +39,7 @@
     background-color: yellow;
     }
 </style>
+
 
 @code 
 {

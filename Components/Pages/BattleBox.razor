@@ -1,7 +1,7 @@
-﻿@page "/"
+﻿@page "/battlebox"
 @using PacificBattle.CombatResolution
 @using PacificBattle.Interfaces
-@using PacificBattle.Components.GamePieces
+@inject ILogger<BattleBox> logger
 @inject IFleetManager fm
 
 <div id="page">
@@ -13,24 +13,18 @@
         <div id="battlebox" class="d-flex justify-content-around p-4">
 
             @* Attack Ship *@
-            <div class="flex-column text-center ms-4">
+            <div class="w-25 flex-column text-center ms-4">
                 <ShipTile Ship="Aggressor"></ShipTile>
                 <p>Total Damage: @Aggressor.Damage.TotalDamage</p>
             </div>
 
             @* Combat Results *@
-            <div class="flex-column">
-                <h5 class="text-center"><b>Combat Results</b></h5>
-                <br />
-                <h5>@BattleTitle</h5>
-                <br />
-                <h6 class="">@CombatMessage</h6>
-                <br />
-                <h6>@Status</h6>
+            <div class="w-50">                
+                <CombatLog Messages="BattleLogs" />
             </div>
 
             @* Defender Ship *@
-            <div class="flex-column text-center me-4">
+            <div class="w-25 flex-column text-center me-4">
                 <ShipTile Ship="Defender"></ShipTile>
                 <p>Total Damage: @Defender.Damage.TotalDamage</p>
             </div>
@@ -40,11 +34,11 @@
         <div id="buttonbox" class="d-flex justify-content-around p-4">
 
             <div class="p-1">
-                <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" ><b>Attack</b></button>
+                <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@isResolved"><b>Attack!</b></button>
             </div>
 
             <div class="p-1">
-                <button class="btn btn-success m-4 p-4" @onclick="GetShips" hidden="@(!isReturnRound)"><b>Get Ships</b></button>
+                <button class="btn btn-success m-1 p-3" @onclick="GetShips" hidden="@(!isResolved)"><b>Get Ships</b></button>
             </div>
 
         </div>
@@ -61,16 +55,18 @@
         background-color: black;
     }
     #topbar {
-        height: 15vh;
+        height: 25vh;
         background-color: gray;
     }
 
     #battlebox {
-    background-color: cyan;
+        height: 50vh;
+        background-color: cyan;
     }
 
     #buttonbox {
-    background-color: gray;
+        height: 25vh;
+        background-color: gray;
     }
 </style>
 
@@ -82,82 +78,108 @@
     public CombatShip Defender { get; set; } = new();
 
     // Display
-    public string BattleTitle { get; set; } = string.Empty;
-    public string CombatMessage { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    public List<string> BattleLogs { get; set; } = [];
 
     // Toggle Swap
     private bool isReturnRound;
+    private bool isResolved;
 
-    // Populate Battle
+    // Initialize
     protected override void OnInitialized()
     {
         GetShips();
     } 
 
+    private void Reset()
+    {
+        BattleLogs.Clear();
+        isReturnRound = false;
+        isResolved = false;
+    }
+
+    // Populate
     private void GetShips()
     {
         Reset();
         Aggressor = fm.BuildRandomShipByNavy(2);
         Defender = fm.BuildRandomShipByNavy(1);
-        BattleTitle = $"{Aggressor.ShipName} vs. {Defender.ShipName}";
-        CombatMessage = $"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)";
+        
+        BattleLogs.Add($"{Aggressor.ShipName} vs. {Defender.ShipName}");
     }
 
-    private void Reset()
-    {
-        BattleTitle = string.Empty;
-        Status = string.Empty;
-        CombatMessage = string.Empty;
-        isReturnRound = false;
-    }
-
+    // Battle
     private void StartCombat()
     {
-
-        Task.Delay(100);
-
         if (Aggressor.Guns != 0)
         {
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
+            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");            
             Attack(Aggressor.Guns, Defender);
+            DetermineStatus(Defender);
         }
         else
         {
-            CombatMessage = "Aircraft carrier has no guns to attack with.";            
+            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
+            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
+            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
+            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
+            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
         }
 
         if (!isReturnRound) 
         {
-            CombatMessage = $"{Defender.ShipName} returns fire";
-            Task.Delay(100);
-            Swap(); 
-            CombatMessage = $"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)";
+            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            BattleLogs.Add($"{Defender.ShipName} returns fire");
+            Swap();
+            isReturnRound = true;
         }
-        isReturnRound = !isReturnRound;
-        // StateHasChanged();
+        else
+        {
+            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");
+            BattleLogs.Add("Action complete");
+            isResolved = true;
+            foreach (var log in BattleLogs)
+            {
+                logger.LogInformation(log);
+            }
+            logger.LogInformation("");
+        }
     }
 
     private void Attack(int guns, CombatShip target)
     {
         AttackCoordinator.Target = target;
         AttackCoordinator.ResolveAttack(guns);
-        DetermineStatus(Defender);
     }
 
     private void DetermineStatus(CombatShip target)
     {
         if (target.Damage.IsDisabled)
         {
-            Status = $"{target.ShipName} has been disabled!";
+            BattleLogs.Add($"{target.ShipName} has been disabled!");
         };
+        foreach (var log in target.Damage.DamageLogs)
+        {
+            BattleLogs.Add(log);
+        }
         if (target.IsSunk)
         {
-            Status = $"{target.ShipName} has been sunk!";
+            BattleLogs.Add($"{target.ShipName} has been sunk!");
         };
     }
 
+    // Switch Sides
     private void Swap(){
-        // Defender.Damage.DamageLogs.Clear();
         CombatShip temp = Aggressor;
         Aggressor = Defender;
         Defender = temp;

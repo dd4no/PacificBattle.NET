@@ -1,6 +1,6 @@
-﻿namespace PacificBattle.Classes
+﻿namespace PacificBattle.Ships
 {
-    public class Location
+    public class ShipLocation
     {
         public string LocationGroup { get; set; } = string.Empty;
         public bool InPort { get; set; } = true;
