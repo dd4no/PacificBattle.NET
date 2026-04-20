@@ -18,8 +18,8 @@
 
 <style>
     .shipTile {
-        width: 300px;
-        height: 300px;
+        width: 250px;
+        height: 150px;
         margin: 2rem;
         padding: 2rem;
         border: 2px solid black;
@@ -51,7 +51,6 @@
     protected override void OnParametersSet()
     {
         color = SetColor(Ship.NavyId);
-        StateHasChanged();
     }
 
     private string SetColor(int navyId)
