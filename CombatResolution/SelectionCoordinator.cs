@@ -3,7 +3,7 @@ namespace PacificBattle.CombatResolution
 {
     public sealed class SelectionCoordinator<T> where T : class
     {
-        public IReadOnlyDictionary<T, T> Pairs => _pairs;
+        public Dictionary<T, T> Pairs => _pairs;
         public T? Pending => _pending;
         public bool PairComplete => _pairComplete;
 
@@ -24,20 +24,24 @@ namespace PacificBattle.CombatResolution
             if (_pending == null)
             {
                 _pending = item;
+                _pairComplete = false;
                 return true;
             }
 
-            // Deselect if clicked again
+            // Deselect same item on second click
             if (EqualityComparer<T>.Default.Equals(_pending, item))
             {
                 _pending = null;
+                _pairComplete = false;
                 return true;
             }
 
-            // Add Pairing to dictionary
+            // Add second item and add pair to dictionary
             _pairs[_pending] = item;
-            _pairComplete = true;
+
+            // End selection round
             _pending = null;
+            _pairComplete = true;
             return true;
         }
     }

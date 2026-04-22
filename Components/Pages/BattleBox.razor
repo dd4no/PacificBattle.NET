@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
             @foreach (var ship in Aggressors)
             {   
-                <button class="selectable" @onclick="() => OnItemClicked(ship)">
+                <button class="@(IsSelected(ship) ? "selected" : "selectable")" @onclick="() => OnItemClicked(ship)">
                     <ShipTile Ship="ship"></ShipTile>
                 </button>             
             }
@@ -22,7 +22,7 @@
         <div class="d-flex justify-content-around mt-4 pt-4">
             @foreach (var ship in Defenders)
             {
-                <button class="selectable" @onclick="() => OnItemClicked(ship)">
+                <button class="@(IsSelected(ship) ? "selected" : "selectable")" @onclick="() => OnItemClicked(ship)">
                     <ShipTile Ship="ship"></ShipTile>
                 </button>             
             }
@@ -106,8 +106,9 @@
     public List<string> BattleLogs { get; set; } = [];
 
     // Selection
-    private bool selectionMode;
+    private bool _selected;
 
+    #region Init
     // Initialize
     protected override void OnInitialized()
     {
@@ -128,21 +129,35 @@
         Aggressors = fm.GetFleet(2, 3);
         Defenders = fm.GetFleet(1, 4);
     }
-
+    #endregion
 
     private void OnItemClicked(CombatShip ship)
-    {        
-        Coordinator.Click(ship);
+    {
+        if (IsSelected(ship))
+        {
+            BattleLogs.Add($"{ship.ShipName} already selected");
+            return;
+        }
+        else
+        {
+            Coordinator.Click(ship);
+        }
 
         if (Coordinator.PairComplete)
         {
-            foreach (var pair in Coordinator.Pairs)
-            {
-                Console.WriteLine($"{pair.Key.ShipName} vs. {pair.Value.ShipName}");
-            }
-
+            var pair = Coordinator.Pairs.Last();
+            BattleLogs.Add($"{pair.Key.ShipName} vs. {pair.Value.ShipName}");
         }
 
+    }
+
+    private bool IsSelected(CombatShip ship)
+    {
+        if (Coordinator.Pairs.ContainsKey(ship) || Coordinator.Pairs.ContainsValue(ship))
+        {
+            return true;
+        }
+        return false;
     }
 }
 
