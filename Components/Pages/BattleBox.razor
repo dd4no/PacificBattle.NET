@@ -112,17 +112,16 @@
 
 @code 
 {
-    // Fleets
     public List<Ships.CombatShip> Aggressors { get; set; } = [];
     public List<Ships.CombatShip> Defenders { get; set; } = [];
-    public int Round { get; set; } = 1;
 
-    // Selection
-    private SelectionCoordinator Coordinator { get; set; } = new();
-    private bool _selecting;
-
-    // Display Properties
     public List<string> BattleLogs { get; set; } = [];
+
+    public int Round { get; set; }
+
+    private SelectionCoordinator _coordinator = new();
+    private bool _selecting;
+    private bool _startNewPair;
 
     #region Init
     protected override void OnInitialized()
@@ -135,6 +134,8 @@
         Aggressors.Clear();
         Defenders.Clear();
         BattleLogs.Clear();
+        Round = 1;
+        _startNewPair = true;
     }
 
     private void GetShips()
@@ -153,27 +154,44 @@
 
     private void OnShipSelected(CombatShip ship)
     {
-        if (Coordinator.Pairs.Count >= Aggressors.Count)
+        // Start a new Pair
+        if (_startNewPair)
         {
-            BattleLogs.Add("No more ships to attack with");                
-            return;
-        }
-        if (Coordinator.SelectedShip is null)
-        {
-            if (Defenders.Contains(ship))
-            {
-                BattleLogs.Add("Choose one of your ships!");                
+            // Prevent reselection
+            if (!ship.Selected)
+            {                
+                // Prevent Defender from being first choice
+                if (Defenders.Contains(ship))
+                {
+                    BattleLogs.Add("Choose one of your ships!");
+                }
+                else
+                {
+                    _coordinator.AddToPair(ship);
+                    BattleLogs.Add(_coordinator.Message);
+                    _startNewPair = !_coordinator.IsPairing;
+                }
             }
             else
             {
-                Coordinator.ChoosePair(ship);
-                BattleLogs.Add(Coordinator.Message);                
+                BattleLogs.Add("Ship already selected");                
             }
         }
         else
         {
-            Coordinator.ChoosePair(ship);
-            BattleLogs.Add(Coordinator.Message);                
+            // Prevent Friendly Fire
+            if (Aggressors.Contains(ship) 
+                && !EqualityComparer<CombatShip>.Default
+                .Equals(_coordinator.SelectedShip, ship))
+            {
+                BattleLogs.Add("Don't shoot your own ship!");                                
+            }
+            else
+            {
+                _coordinator.AddToPair(ship);
+                BattleLogs.Add(_coordinator.Message);
+                _startNewPair = !_coordinator.IsPairing;
+            }
         }
     }
 

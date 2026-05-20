@@ -3,14 +3,22 @@
 namespace PacificBattle.CombatResolution
 {
     public class SelectionCoordinator
-    {       
+    {
+        public List<CombatShip> Aggressors => _aggressors;
+        private List<CombatShip> _aggressors = [];
+        public List<CombatShip> Defenders => _defenders;
+        private List<CombatShip> _defenders = [];
+
+        public int Round { get; private set; }
+
+
         public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
         public bool IsPairing { get; set; }
         public string Message { get; set; } = string.Empty;
 
         public CombatShip? SelectedShip { get; set; }
 
-        public bool ChoosePair(CombatShip ship)
+        public bool AddToPair(CombatShip ship)
         {
             Message = string.Empty;
 
