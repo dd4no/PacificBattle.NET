@@ -32,7 +32,7 @@ namespace PacificBattle.Managers
         }
 
         // Get Test Fleets
-        public List<CombatShip> GetFleet(int navyId, int numberOfShips)
+        public List<CombatShip> GetRandomFleetByNavy(int navyId, int numberOfShips)
         {
             List<CombatShip> fleet = [];
             var ships = GetAllShipsByNavy(navyId);
@@ -58,11 +58,22 @@ namespace PacificBattle.Managers
                     ShipName = ship.ShipName,
                     Guns = ship.Attack,
                     Armor = ship.Armor,
+                    Speed = ship.Speed,
                     Airstrike = ship.Airstrike,
                     HasAttackBonus = ship.HasAttackBonus,
                     Damage = new(),
                     Location = new()
                 };
+
+                // Assign Side
+                if (ship.NavyId == 2)
+                {
+                    newShip.Side = "Japan";
+                }
+                else
+                {
+                    newShip.Side = "Allies";
+                }
 
                 // Assign Starting Location
                 if (ship.LocationGroup != "A")
@@ -75,11 +86,11 @@ namespace PacificBattle.Managers
                 {
                     newShip.Type = "Aircraft Carrier";
                 }
-                if (ship.Attack > 1)
+                else if (ship.Attack > 1 && ship.Airstrike == 0)
                 {
                     newShip.Type = "Battleship";
                 }
-                if (ship.Attack == 1 && ship.Airstrike == 0)
+                else
                 {
                     newShip.Type = "Cruiser";
                 }

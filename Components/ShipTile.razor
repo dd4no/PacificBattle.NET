@@ -1,15 +1,15 @@
 ﻿
 <div class="text-center shipTile @color">
-
+    <h6>@Ship.Side</h6>
     <h3 class="strong">@Ship.ShipName</h3>
-
+    <h6>@Ship.Type</h6>
     <div class="d-flex justify-content-between">
-        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Guns</p>
+        <p class="@(Ship.HasAttackBonus ? "bonus" : "" )">@Ship.Guns</p>
         <p class="">@Ship.Armor</p>
         <p class="">@Ship.Speed</p>
         @if (Ship.Airstrike != 0)
         {
-            <p>@Ship.Airstrike</p>
+            <p class="ps-2">@Ship.Airstrike</p>
         }
     </div>
 
@@ -21,8 +21,15 @@
         width: 250px;
         height: 150px;
         margin: 2rem;
-        padding: 2rem;
+        padding: 1rem;
         border: 2px solid black;
+    }
+
+    .bonus {
+        /* margin-bottom: .25rem; */
+        padding: 0 .25rem;
+        border: 1px solid black;
+        border-radius: 20px;
     }
 
     .blue {

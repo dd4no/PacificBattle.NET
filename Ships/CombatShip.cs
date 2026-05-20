@@ -2,12 +2,13 @@
 {
     public class CombatShip
     {
-        public int ShipId { get; set; }
-        public string Type { get; set; } = string.Empty;
+        public string ShipName { get; set; } = string.Empty;
+
         public int NavyId { get; set; }
+        public string Side { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public int EndTurn { get; set; }
 
-        public string ShipName { get; set; } = string.Empty;
 
         public int Guns { get; set; }
         public int Armor { get; set; }
@@ -19,5 +20,7 @@
         public bool IsSunk => Damage.TotalDamage >= Armor;
 
         public ShipLocation Location { get; set; } = new();
+
+        public bool Selected { get; set; }
     }
 }

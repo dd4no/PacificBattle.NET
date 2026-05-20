@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
             @foreach (var ship in Aggressors)
             {   
-                <button class="@(IsSelected(ship) ? "selected" : "selectable")" @onclick="() => OnItemClicked(ship)">
+                <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => OnShipSelected(ship)">
                     <ShipTile Ship="ship"></ShipTile>
                 </button>             
             }
@@ -22,7 +22,7 @@
         <div class="d-flex justify-content-around mt-4 pt-4">
             @foreach (var ship in Defenders)
             {
-                <button class="@(IsSelected(ship) ? "selected" : "selectable")" @onclick="() => OnItemClicked(ship)">
+                <button class="defender @(ship.Selected ? "selected" : "selectable")" @onclick="() => OnShipSelected(ship)">
                     <ShipTile Ship="ship"></ShipTile>
                 </button>             
             }
@@ -34,8 +34,18 @@
 
         <div id="buttonbox" class="w-75 d-flex py-4">
 
-            <div class="w-25 text-center p-1">
-                <button class="btn btn-success m-1 p-3" @onclick="GetShips"><b>Get Ships</b></button>
+            <div class="w-50 text-center p-1">
+                <button class="app-button" @onclick="GetShips"><b>Get Ships</b></button>
+            </div>
+
+            <div class="d-flex w-50">
+                <div class="w-50 text-center p-1">
+                    <button id="selectButton" class="app-button" hidden="@_selecting" @onclick="StartSelecting"><b>Select Ships</b></button>
+                </div>
+
+                <div class="w-50 text-center p-1">
+                    <button id="startButton" class="app-button" hidden="@(!_selecting)" @onclick="ResolveCombat"><b>Start Battle</b></button>
+                </div>
             </div>
 
         </div>
@@ -52,7 +62,6 @@
 
 </div>
 
-
 <style>
 
     #page {
@@ -62,7 +71,7 @@
 
     #shipBox {
         height: 75%;
-    }
+    }    
 
     #bottombox {
         height: 25%;
@@ -70,6 +79,15 @@
     }
 
     #buttonbox {
+    }
+
+    #selectButton {
+        background-color: yellow;
+    }
+
+    #startButton {
+        background-color: red;
+        color: yellow;
     }
 
     #logbox {
@@ -92,28 +110,24 @@
 
 </style>
 
-
 @code 
 {
-    // Selection
-    private SelectionCoordinator<CombatShip> Coordinator { get; set; } = new();
-
     // Fleets
     public List<Ships.CombatShip> Aggressors { get; set; } = [];
     public List<Ships.CombatShip> Defenders { get; set; } = [];
+    public int Round { get; set; } = 1;
+
+    // Selection
+    private SelectionCoordinator Coordinator { get; set; } = new();
+    private bool _selecting;
 
     // Display Properties
     public List<string> BattleLogs { get; set; } = [];
 
-    // Selection
-    private bool _selected;
-
     #region Init
-    // Initialize
     protected override void OnInitialized()
     {
         GetShips();
-        Coordinator.StartRound();
     } 
 
     private void Reset()
@@ -126,38 +140,46 @@
     private void GetShips()
     {
         Reset();
-        Aggressors = fm.GetFleet(2, 3);
-        Defenders = fm.GetFleet(1, 4);
+        Aggressors = fm.GetRandomFleetByNavy(2, 3);
+        Defenders = fm.GetRandomFleetByNavy(1, 4);
     }
+
     #endregion
 
-    private void OnItemClicked(CombatShip ship)
+    private void StartSelecting()
     {
-        if (IsSelected(ship))
+        _selecting = true;
+    }
+
+    private void OnShipSelected(CombatShip ship)
+    {
+        if (Coordinator.Pairs.Count >= Aggressors.Count)
         {
-            BattleLogs.Add($"{ship.ShipName} already selected");
+            BattleLogs.Add("No more ships to attack with");                
             return;
+        }
+        if (Coordinator.SelectedShip is null)
+        {
+            if (Defenders.Contains(ship))
+            {
+                BattleLogs.Add("Choose one of your ships!");                
+            }
+            else
+            {
+                Coordinator.ChoosePair(ship);
+                BattleLogs.Add(Coordinator.Message);                
+            }
         }
         else
         {
-            Coordinator.Click(ship);
+            Coordinator.ChoosePair(ship);
+            BattleLogs.Add(Coordinator.Message);                
         }
-
-        if (Coordinator.PairComplete)
-        {
-            var pair = Coordinator.Pairs.Last();
-            BattleLogs.Add($"{pair.Key.ShipName} vs. {pair.Value.ShipName}");
-        }
-
     }
 
-    private bool IsSelected(CombatShip ship)
+    private void ResolveCombat()
     {
-        if (Coordinator.Pairs.ContainsKey(ship) || Coordinator.Pairs.ContainsValue(ship))
-        {
-            return true;
-        }
-        return false;
+        _selecting = false;
     }
-}
+} 
 

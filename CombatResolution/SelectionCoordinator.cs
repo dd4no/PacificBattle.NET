@@ -1,47 +1,48 @@
-﻿
+﻿using PacificBattle.Ships;
+
 namespace PacificBattle.CombatResolution
 {
-    public sealed class SelectionCoordinator<T> where T : class
-    {
-        public Dictionary<T, T> Pairs => _pairs;
-        public T? Pending => _pending;
-        public bool PairComplete => _pairComplete;
+    public class SelectionCoordinator
+    {       
+        public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
+        public bool IsPairing { get; set; }
+        public string Message { get; set; } = string.Empty;
 
-        private readonly Dictionary<T, T> _pairs = [];
-        private T? _pending;
-        private bool _pairComplete;
+        public CombatShip? SelectedShip { get; set; }
 
-        public void StartRound()
+        public bool ChoosePair(CombatShip ship)
         {
-            _pairs.Clear();
-            _pending = null;
-            _pairComplete = false;
-        }
+            Message = string.Empty;
 
-        public bool Click(T item)
-        {
             // Select first item
-            if (_pending == null)
+            if (SelectedShip is null)
             {
-                _pending = item;
-                _pairComplete = false;
+                SelectedShip = ship;
+                IsPairing = true;
+                ship.Selected = true;
+                Message = $"{ship.ShipName} selected";
                 return true;
             }
 
             // Deselect same item on second click
-            if (EqualityComparer<T>.Default.Equals(_pending, item))
+            if (EqualityComparer<CombatShip>.Default.Equals(SelectedShip, ship))
             {
-                _pending = null;
-                _pairComplete = false;
+                SelectedShip = null;
+                IsPairing = false;
+                ship.Selected = false;
+                Message = $"{ship.ShipName} deselected";
                 return true;
             }
 
             // Add second item and add pair to dictionary
-            _pairs[_pending] = item;
+            ship.Selected = true;
+            Pairs[SelectedShip] = ship;
+            var pair = Pairs.Last();
+            Message = $"{pair.Key.ShipName} vs. {pair.Value.ShipName}";
 
             // End selection round
-            _pending = null;
-            _pairComplete = true;
+            SelectedShip = null;
+            IsPairing = false;
             return true;
         }
     }

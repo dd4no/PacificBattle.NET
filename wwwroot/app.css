@@ -3,6 +3,15 @@ h1:focus {
     outline: none;
 }
 
+.app-button {
+    width: 200px;
+    height: 35px;
+    margin: .25rem;
+    padding: .25rem;
+    border-radius: 10px;
+    background-color: green;
+}
+
 /* Custom Classes */
 
 

@@ -8,6 +8,6 @@ namespace PacificBattle.Interfaces
         List<Ship> GetAllShips();
         List<Ship> GetAllShipsByNavy(int navyId);
         CombatShip GetRandomShipByNavy(int navyId);
-        List<CombatShip> GetFleet(int navyId, int numberOfShips);
+        List<CombatShip> GetRandomFleetByNavy(int navyId, int numberOfShips);
     }
 }
