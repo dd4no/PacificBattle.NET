@@ -5,11 +5,27 @@ h1:focus {
 
 .app-button {
     width: 200px;
-    height: 35px;
-    margin: .25rem;
+    height: 40px;
     padding: .25rem;
     border-radius: 10px;
-    background-color: green;
+}
+
+.utility-button{
+    width: 80px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.utility-action {
+    background-color: red;
+}
+
+.utility-cancel {
+    background-color: gray;
+}
+
+p,h1,h2,h3,h4,h5,h6 {
+    margin: 0 !important;
 }
 
 /* Custom Classes */

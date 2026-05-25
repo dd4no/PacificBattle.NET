@@ -1,18 +1,21 @@
+using Microsoft.AspNetCore.Components;
 using PacificBattle.CombatResolution;
+using PacificBattle.Interfaces;
 using PacificBattle.Ships;
 
 namespace PacificBattle.Components.Pages
 {
     public partial class BattleBox
     {
-        public List<Ships.CombatShip> Aggressors { get; set; } = [];
-        public List<Ships.CombatShip> Defenders { get; set; } = [];
+        [Inject] public IFleetManager FM { get; set; } = default!;
+        public List<CombatShip> Aggressors { get; set; } = [];
+        public List<CombatShip> Defenders { get; set; } = [];
 
         public List<string> BattleLogs { get; set; } = [];
 
         public int Round { get; set; }
 
-        private SelectionCoordinator _coordinator = new();
+        private readonly SelectionCoordinator _coordinator = new();
         private bool _selecting;
         private bool _startNewPair;
 
@@ -34,8 +37,8 @@ namespace PacificBattle.Components.Pages
         private void GetShips()
         {
             Reset();
-            Aggressors = fm.GetRandomFleetByNavy(2, 3);
-            Defenders = fm.GetRandomFleetByNavy(1, 4);
+            Aggressors = FM.GetRandomFleetByNavy(2, 3);
+            Defenders = FM.GetRandomFleetByNavy(1, 4);
         }
 
         #endregion
@@ -86,6 +89,13 @@ namespace PacificBattle.Components.Pages
                     _startNewPair = !_coordinator.IsPairing;
                 }
             }
+        }
+
+        private void ResetPairings()
+        {
+            _startNewPair = true;
+            _coordinator.ClearPairs();
+            BattleLogs.Add(_coordinator.Message);
         }
 
         private void ResolveCombat()

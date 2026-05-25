@@ -1,4 +1,5 @@
-﻿using PacificBattle.Ships;
+﻿using Microsoft.AspNetCore.SignalR.Protocol;
+using PacificBattle.Ships;
 
 namespace PacificBattle.CombatResolution
 {
@@ -12,9 +13,6 @@ namespace PacificBattle.CombatResolution
 
         public bool AddToPair(CombatShip ship)
         {
-            // Clear Message
-            Message = string.Empty;
-
             // Select first ship
             if (SelectedShip is null)
             {
@@ -45,6 +43,26 @@ namespace PacificBattle.CombatResolution
             SelectedShip = null;
             IsPairing = false;
             return true;
+        }
+
+        public void ClearPairs()
+        {
+            if (SelectedShip is not null)
+            {
+                SelectedShip.Selected = false;
+            }
+            SelectedShip = null;
+
+            IsPairing = false;
+
+            foreach (var pair in Pairs)
+            {
+                pair.Key.Selected = false;
+                pair.Value.Selected = false;
+            }
+
+            Pairs.Clear();
+            Message = "All match-ups reset";
         }
     }
 }

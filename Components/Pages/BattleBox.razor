@@ -1,8 +1,10 @@
 ﻿@page "/"
-@using PacificBattle.CombatResolution
-@using PacificBattle.Interfaces
-@inject ILogger<BattleBox> logger
-@inject IFleetManager fm
+
+<ConfirmationDialog 
+    Title="Confirm Action"
+    Message="This will clear all current match-ups.  Are you sure?"
+    OnAction="ResetPairings">
+</ConfirmationDialog>
 
 <div id="page">
 
@@ -30,9 +32,9 @@
          
     </div>
 
-    <div id="bottombox" class="d-flex">
+    <div id="top-box" class="d-flex">
 
-        <div id="buttonbox" class="w-75 d-flex py-4">
+        <div id="buttonbar" class="w-75 d-flex p-4">
 
             <div class="w-50 text-center p-1">
                 <button class="app-button" @onclick="GetShips"><b>Get Ships</b></button>
@@ -40,7 +42,24 @@
 
             <div class="d-flex w-50">
                 <div class="w-50 text-center p-1">
-                    <button id="selectButton" class="app-button" hidden="@_selecting" @onclick="StartSelecting"><b>Select Ships</b></button>
+
+                    <button 
+                        id="selectButton" 
+                        class="app-button" 
+                        hidden="@_selecting" 
+                        @onclick="StartSelecting">
+                        <b>Select Ships</b>
+                    </button>
+
+                    <button 
+                        id="reset-button" 
+                        class="app-button" 
+                        hidden="@(!_selecting)" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#dialogBox">
+                        <b>Reset Pairs</b>
+                    </button>
+
                 </div>
 
                 <div class="w-50 text-center p-1">
