@@ -4,14 +4,6 @@ namespace PacificBattle.CombatResolution
 {
     public class SelectionCoordinator
     {
-        public List<CombatShip> Aggressors => _aggressors;
-        private List<CombatShip> _aggressors = [];
-        public List<CombatShip> Defenders => _defenders;
-        private List<CombatShip> _defenders = [];
-
-        public int Round { get; private set; }
-
-
         public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
         public bool IsPairing { get; set; }
         public string Message { get; set; } = string.Empty;
@@ -20,9 +12,10 @@ namespace PacificBattle.CombatResolution
 
         public bool AddToPair(CombatShip ship)
         {
+            // Clear Message
             Message = string.Empty;
 
-            // Select first item
+            // Select first ship
             if (SelectedShip is null)
             {
                 SelectedShip = ship;
