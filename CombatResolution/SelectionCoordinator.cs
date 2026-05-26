@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.SignalR.Protocol;
-using PacificBattle.Ships;
+﻿using PacificBattle.Ships;
 
 namespace PacificBattle.CombatResolution
 {
     public class SelectionCoordinator
     {
         public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
+        public CombatShip? SelectedShip { get; set; }
         public bool IsPairing { get; set; }
         public string Message { get; set; } = string.Empty;
-
-        public CombatShip? SelectedShip { get; set; }
 
         public bool AddToPair(CombatShip ship)
         {
@@ -50,8 +48,8 @@ namespace PacificBattle.CombatResolution
             if (SelectedShip is not null)
             {
                 SelectedShip.Selected = false;
+                SelectedShip = null;
             }
-            SelectedShip = null;
 
             IsPairing = false;
 
@@ -62,7 +60,7 @@ namespace PacificBattle.CombatResolution
             }
 
             Pairs.Clear();
-            Message = "All match-ups reset";
+            Message = $"All match-ups reset";
         }
     }
 }

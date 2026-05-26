@@ -5,24 +5,29 @@ using PacificBattle.Ships;
 
 namespace PacificBattle.Managers
 {
-    public class FleetManager(AppDbContext db, ILogger<FleetManager> logger) : IFleetManager
+    public class FleetManager(
+        AppDbContext db, 
+        ILogger<FleetManager> logger) 
+        : IFleetManager
     {
         private readonly AppDbContext _db = db;
         private readonly ILogger<FleetManager> _logger = logger;
 
+        #region Orders
         // Get All
         public List<Ship> GetAllShips()
         {
             return _db.Ships.ToList();
         }
 
+        // Get All By Navy
         public List<Ship> GetAllShipsByNavy(int navyId)
         {
             var ships = _db.Ships.Where(x => x.NavyId == navyId).ToList();
             return ships;
         }
 
-        // Get Random Ships for single battle testing
+        // Get Random Ship for single battle testing
         public CombatShip GetRandomShipByNavy(int navyId)
         {
             var ships = GetAllShipsByNavy(navyId);
@@ -44,6 +49,7 @@ namespace PacificBattle.Managers
 
             return fleet;
         }
+        #endregion
 
         #region Shipyard
         private CombatShip BuildShip(Ship ship)
@@ -53,9 +59,19 @@ namespace PacificBattle.Managers
                 // Build Ship
                 var newShip = new CombatShip
                 {
-                    NavyId = ship.NavyId,
-                    EndTurn = ship.EndTurn,
                     ShipName = ship.ShipName,
+                    NavyId = ship.NavyId,
+                    Side = ship.NavyId switch
+                    {
+                        1 => "US",
+                        2 => "Japan",
+                        3 => "Great Britain",
+                        4 => "Austrailia",
+                        5 => "Netherlands",
+                        _ => "Unknown"
+                    },
+                    Type = GetType(ship),
+                    EndTurn = ship.EndTurn,
                     Guns = ship.Attack,
                     Armor = ship.Armor,
                     Speed = ship.Speed,
@@ -65,34 +81,10 @@ namespace PacificBattle.Managers
                     Location = new()
                 };
 
-                // Assign Side
-                if (ship.NavyId == 2)
-                {
-                    newShip.Side = "Japan";
-                }
-                else
-                {
-                    newShip.Side = "Allies";
-                }
-
                 // Assign Starting Location
                 if (ship.LocationGroup != "A")
                 {
                     newShip.Location.LocationGroup = ship.LocationGroup;
-                }
-
-                // Assign Type
-                if (ship.Airstrike > 0)
-                {
-                    newShip.Type = "Aircraft Carrier";
-                }
-                else if (ship.Attack > 1 && ship.Airstrike == 0)
-                {
-                    newShip.Type = "Battleship";
-                }
-                else
-                {
-                    newShip.Type = "Cruiser";
                 }
 
                 return newShip;
@@ -102,7 +94,23 @@ namespace PacificBattle.Managers
                 _logger.LogError("{ex}", ex);
                 return new();
             }
-        }        
-        #endregion Shipyard
+        }
+        
+        private static string GetType(Ship ship)
+        {
+            if (ship.Airstrike > 0)
+            {
+                return "Aircraft Carrier";
+            }
+            else if (ship.Attack > 1 && ship.Airstrike == 0)
+            {
+                return "Battleship";
+            }
+            else
+            {
+                return "Cruiser";
+            }
+        }
+        #endregion
     }
 }

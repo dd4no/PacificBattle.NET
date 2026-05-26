@@ -8,78 +8,93 @@
 
 <div id="page">
 
-    <div id="shipBox"class="p-1">
+    <div id="sea-area" class="flex-column">
 
-        @* Attacking Ships *@
-        <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
-            @foreach (var ship in Aggressors)
-            {   
-                <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => OnShipSelected(ship)">
-                    <ShipTile Ship="ship"></ShipTile>
-                </button>             
-            }
+        <div id="top-bar">
+
+            <!-- Get Ships -->
+            <div class="button-group">
+                <button 
+                    id="start-button"
+                    class="app-button" 
+                    disabled="@_selecting"
+                    @onclick="GetShips">
+                    <b>Get Ships</b>
+                </button>
+            </div>
+
+            <!-- Enter Selection Mode -->
+            <div class="button-group">
+                <button
+                    id="selectButton" 
+                    class="app-button" 
+                    hidden="@_selecting" 
+                    @onclick="StartSelecting">
+                    <b>Pair Ships</b>
+                </button>
+            </div>
+
+            <!-- Reset Pair -->
+            <div class="button-group">
+                <button 
+                    id="reset-button" 
+                    class="app-button" 
+                    hidden="@(!_selecting)" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#dialogBox">
+                    <b>Reset Pairs</b>
+                </button>
+            </div>
+
+            <!-- Start Battle -->
+            <div class="button-group">
+                <button 
+                    id="battle-button" 
+                    class="app-button" 
+                    hidden="@(!_selecting)" 
+                    @onclick="ResolveCombat">
+                    <b>Start Battle</b>
+                </button>
+            </div>
+
         </div>
 
-        @* Defending Ships *@
-        <div class="d-flex justify-content-around mt-4 pt-4">
-            @foreach (var ship in Defenders)
-            {
-                <button class="defender @(ship.Selected ? "selected" : "selectable")" @onclick="() => OnShipSelected(ship)">
-                    <ShipTile Ship="ship"></ShipTile>
-                </button>             
-            }
-        </div>
+        <div id="ship-box">
+
+            @* Attacking Ships *@
+            <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
+                @foreach (var ship in Aggressors)
+                {   
+                    <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => SelectShip(ship)">
+                        <ShipTile Ship="ship"></ShipTile>
+                    </button>             
+                }
+            </div>
+
+            @* Defending Ships *@
+            <div class="d-flex justify-content-around mt-4 pt-4">
+                @foreach (var ship in Defenders)
+                {
+                    <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => SelectShip(ship)">
+                        <ShipTile Ship="ship"></ShipTile>
+                    </button>             
+                }
+            </div>
          
+        </div>
+
     </div>
 
-    <div id="top-box" class="d-flex">
+    <div id="log-box">
 
-        <div id="buttonbar" class="w-75 d-flex p-4">
-
-            <div class="w-50 text-center p-1">
-                <button class="app-button" @onclick="GetShips"><b>Get Ships</b></button>
-            </div>
-
-            <div class="d-flex w-50">
-                <div class="w-50 text-center p-1">
-
-                    <button 
-                        id="selectButton" 
-                        class="app-button" 
-                        hidden="@_selecting" 
-                        @onclick="StartSelecting">
-                        <b>Select Ships</b>
-                    </button>
-
-                    <button 
-                        id="reset-button" 
-                        class="app-button" 
-                        hidden="@(!_selecting)" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#dialogBox">
-                        <b>Reset Pairs</b>
-                    </button>
-
-                </div>
-
-                <div class="w-50 text-center p-1">
-                    <button id="startButton" class="app-button" hidden="@(!_selecting)" @onclick="ResolveCombat"><b>Start Battle</b></button>
-                </div>
-            </div>
-
-        </div>
-
-        <div id="logbox" class="w-25">
-
-            @* Combat Results *@
-            <h4 class="text-center pt-1">Combat Log</h4>
-            <CombatLog Messages="BattleLogs" />
-
-        </div>
+        @* Combat Results *@
+        <h4 class="text-center p-3">Combat Log</h4>
+        <CombatLog Messages="BattleLogs" />
 
     </div>
 
 </div>
+
 
 
 

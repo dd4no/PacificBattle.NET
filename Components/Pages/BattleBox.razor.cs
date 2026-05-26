@@ -48,7 +48,7 @@ namespace PacificBattle.Components.Pages
             _selecting = true;
         }
 
-        private void OnShipSelected(CombatShip ship)
+        private void SelectShip(CombatShip ship)
         {
             // Start a new Pair
             if (_startNewPair)
@@ -96,6 +96,7 @@ namespace PacificBattle.Components.Pages
             _startNewPair = true;
             _coordinator.ClearPairs();
             BattleLogs.Add(_coordinator.Message);
+            BattleLogs.Add("__________________");
         }
 
         private void ResolveCombat()
