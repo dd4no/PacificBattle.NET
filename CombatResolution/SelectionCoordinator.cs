@@ -1,8 +1,9 @@
 ﻿using PacificBattle.Ships;
+using Serilog;
 
 namespace PacificBattle.CombatResolution
 {
-    public class SelectionCoordinator
+    public class SelectionCoordinator()
     {
         public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
         public CombatShip? SelectedShip { get; set; }
@@ -35,7 +36,8 @@ namespace PacificBattle.CombatResolution
             ship.Selected = true;
             Pairs[SelectedShip] = ship;
             var pair = Pairs.Last();
-            Message = $"{pair.Key.ShipName} vs. {pair.Value.ShipName}";
+            Message = $"{pair.Key.ShipName} attacks {pair.Value.ShipName}";
+            Log.Information("{msg}", Message);
 
             // End selection round
             SelectedShip = null;
@@ -61,6 +63,7 @@ namespace PacificBattle.CombatResolution
 
             Pairs.Clear();
             Message = $"All match-ups reset";
+            Log.Information("{msg}", Message);
         }
     }
 }
