@@ -1,0 +1,50 @@
+/* Base Tile */
+    .ship-tile {
+        width: 250px;
+        height: 150px;
+        margin: 2rem;
+        padding: 1rem;
+        border: 2px solid black;
+    }
+    .ship-tile:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+
+    /* Color */
+    .blue {
+    background-color: blue;
+    color: white;
+    }
+    .red {
+    background-color: red;
+    }
+    .green {
+    background-color: green;
+    }
+    .yellow {
+    background-color: yellow;
+    }
+
+    /* State */
+    .ship-tile.selecting {
+        border: 2px solid gold;
+    }
+    .ship-tile.assigned {
+        box-shadow:  1px -1px 20px 30px orange;
+    }
+    .ship-tile.targeted {
+        box-shadow:  1px -1px 20px 30px gray;
+    }
+
+    /* Badge */
+    .target-badge {
+        float: right;
+    }
+
+    /* Attack Bonus Indicator*/
+    .attack-bonus {
+        padding: 0 .25rem;
+        border: 1px solid black;
+        border-radius: 20px;
+    }

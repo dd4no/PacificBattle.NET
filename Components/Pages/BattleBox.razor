@@ -65,9 +65,12 @@
             <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
                 @foreach (var ship in Aggressors)
                 {   
-                    <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => SelectShip(ship)">
-                        <ShipTile Ship="ship"></ShipTile>
-                    </button>             
+                    <div @onclick="() => SelectShip(ship)">
+                        <ShipTile 
+                            Ship="ship" 
+                            CssClass="@GetShipCss(ship)">
+                        </ShipTile>
+                    </div>             
                 }
             </div>
 
@@ -75,9 +78,17 @@
             <div class="d-flex justify-content-around mt-4 pt-4">
                 @foreach (var ship in Defenders)
                 {
-                    <button class="@(ship.Selected ? "selected" : "selectable")" @onclick="() => SelectShip(ship)">
-                        <ShipTile Ship="ship"></ShipTile>
-                    </button>             
+                    <div @onclick="() => SelectShip(ship)">
+                        <span class="badge text-bg-danger"
+                              hidden="@ship.IncomingAttackCount == 0">
+                            @ship.IncomingAttackCount
+                        </span>
+
+                        <ShipTile 
+                            Ship="ship" 
+                            CssClass="@GetShipCss(ship)">
+                        </ShipTile>
+                    </div>             
                 }
             </div>
          

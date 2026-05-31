@@ -5,63 +5,69 @@ namespace PacificBattle.CombatResolution
 {
     public class SelectionCoordinator()
     {
-        public Dictionary<CombatShip, CombatShip> Pairs { get; set; } = [];
-        public CombatShip? SelectedShip { get; set; }
+        public List<AttackOrder> Orders { get; set; } = [];
+        public CombatShip? PendingAttacker { get; set; }
         public bool IsPairing { get; set; }
         public string Message { get; set; } = string.Empty;
 
-        public bool AddToPair(CombatShip ship)
+        public bool GiveAttackOrder(CombatShip ship)
         {
-            // Select first ship
-            if (SelectedShip is null)
+            // Select ship
+            if (PendingAttacker is null)
             {
-                SelectedShip = ship;
+                PendingAttacker = ship;
                 IsPairing = true;
-                ship.Selected = true;
                 Message = $"{ship.ShipName} selected";
                 return true;
             }
 
-            // Deselect same item on second click
-            if (EqualityComparer<CombatShip>.Default.Equals(SelectedShip, ship))
+            // Deselect on second click
+            if (EqualityComparer<CombatShip>.Default.Equals(PendingAttacker, ship))
             {
-                SelectedShip = null;
+                PendingAttacker = null;
                 IsPairing = false;
-                ship.Selected = false;
                 Message = $"{ship.ShipName} deselected";
                 return true;
             }
 
-            // Add second item and add pair to dictionary
-            ship.Selected = true;
-            Pairs[SelectedShip] = ship;
-            var pair = Pairs.Last();
-            Message = $"{pair.Key.ShipName} attacks {pair.Value.ShipName}";
+            // Add Attack Order
+            Orders.Add( new()
+            {
+                Attacker = PendingAttacker,
+                Defender = ship
+            });
+            PendingAttacker.HasAttackOrder = true;
+            ship.IncomingAttackCount++;
+
+            // Log Order
+            var pair = Orders.Last();
+            Message = $"{pair.Attacker.ShipName} attacks {pair.Defender.ShipName}";
             Log.Information("{msg}", Message);
 
             // End selection round
-            SelectedShip = null;
+            PendingAttacker = null;
             IsPairing = false;
             return true;
         }
 
-        public void ClearPairs()
+        public void ClearOrders()
         {
-            if (SelectedShip is not null)
+            if (PendingAttacker is not null)
             {
-                SelectedShip.Selected = false;
-                SelectedShip = null;
+                PendingAttacker.HasAttackOrder = false;
+                PendingAttacker = null;
             }
 
             IsPairing = false;
 
-            foreach (var pair in Pairs)
+            foreach (var order in Orders)
             {
-                pair.Key.Selected = false;
-                pair.Value.Selected = false;
+                order.Attacker.HasAttackOrder = false;
+                order.Defender.IncomingAttackCount = 0;
             }
 
-            Pairs.Clear();
+            Orders.Clear();
+
             Message = $"All match-ups reset";
             Log.Information("{msg}", Message);
         }

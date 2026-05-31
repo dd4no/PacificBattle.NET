@@ -21,6 +21,7 @@
 
         public ShipLocation Location { get; set; } = new();
 
-        public bool Selected { get; set; }
+        public bool HasAttackOrder { get; set; }
+        public int IncomingAttackCount { get; set; }
     }
 }

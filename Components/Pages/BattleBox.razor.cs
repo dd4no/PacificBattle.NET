@@ -9,19 +9,24 @@ namespace PacificBattle.Components.Pages
     {
         [Inject] public IFleetManager FM { get; set; } = default!;
         [Inject] public ILogger<BattleBox> Logger { get; set; } = default!;
+
         public List<CombatShip> Aggressors { get; set; } = [];
         public List<CombatShip> Defenders { get; set; } = [];
-
         public List<string> BattleLogs { get; set; } = [];
-
-        private bool _firstRound { get; set; }
 
         private readonly SelectionCoordinator _coordinator = new();
         private bool _selecting;
         private bool _startNewPair;
+        private bool _firstRound;
 
         #region Init
         protected override void OnInitialized()
+        {
+            Reset();
+            GetShips();
+        }
+
+        private void Reset()
         {
             Logger.LogInformation("Ships entering sea area");
             Logger.LogInformation("Japan attacks first");
@@ -31,7 +36,6 @@ namespace PacificBattle.Components.Pages
             BattleLogs.Clear();
             _firstRound = true;
             _startNewPair = true;
-            GetShips();
         }
 
         private void GetShips()
@@ -40,6 +44,27 @@ namespace PacificBattle.Components.Pages
             Defenders = FM.GetRandomFleetByNavy(1, 4);
         }
 
+        private string GetShipCss(CombatShip ship)
+        {
+            var css = string.Empty;
+
+            if (_coordinator.PendingAttacker == ship)
+            {
+                css += " selecting";
+            }
+
+            if (ship.HasAttackOrder)
+            {
+                css += " assigned";
+            }
+
+            if (ship.IncomingAttackCount > 0)
+            {
+                css += " targeted";
+            }
+
+            return css;
+        }
         #endregion
 
         private void StartSelecting()
@@ -53,7 +78,7 @@ namespace PacificBattle.Components.Pages
             if (_startNewPair)
             {
                 // Prevent reselection
-                if (!ship.Selected)
+                if (!ship.HasAttackOrder)
                 {
                     // Prevent Defender from being first choice
                     if (Defenders.Contains(ship))
@@ -62,7 +87,7 @@ namespace PacificBattle.Components.Pages
                     }
                     else
                     {
-                        _coordinator.AddToPair(ship);
+                        _coordinator.GiveAttackOrder(ship);
                         BattleLogs.Add(_coordinator.Message);
                         _startNewPair = !_coordinator.IsPairing;
                     }
@@ -77,13 +102,13 @@ namespace PacificBattle.Components.Pages
                 // Prevent Friendly Fire
                 if (Aggressors.Contains(ship)
                     && !EqualityComparer<CombatShip>.Default
-                    .Equals(_coordinator.SelectedShip, ship))
+                    .Equals(_coordinator.PendingAttacker, ship))
                 {
                     BattleLogs.Add("Don't shoot your own ship!");
                 }
                 else
                 {
-                    _coordinator.AddToPair(ship);
+                    _coordinator.GiveAttackOrder(ship);
                     BattleLogs.Add(_coordinator.Message);
                     _startNewPair = !_coordinator.IsPairing;
                 }
@@ -93,7 +118,7 @@ namespace PacificBattle.Components.Pages
         private void ResetPairings()
         {
             _startNewPair = true;
-            _coordinator.ClearPairs();
+            _coordinator.ClearOrders();
             BattleLogs.Add(_coordinator.Message);
             BattleLogs.Add("__________________");
         }
@@ -107,6 +132,7 @@ namespace PacificBattle.Components.Pages
             else
             {
                 BattleLogs.Add("Round Over");
+                Reset();
             }
         }
 
