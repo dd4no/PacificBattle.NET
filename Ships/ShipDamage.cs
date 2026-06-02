@@ -4,10 +4,10 @@ namespace PacificBattle.Ships
 {
     public class ShipDamage
     {
-        public int LifetimeHits { get; set; }
-        public int TotalDamage { get; set; }
-        public bool IsDisabled { get; set; }
-        public List<string> DamageLogs { get; set; } = [];
+        public int LifetimeHits { get; private set; }
+        public int TotalDamage { get; private set; }
+        public bool IsDisabled { get; private set; }
+        public List<string> DamageLogs { get; private set; } = [];
 
         public void Take(DamageReport report)
         {

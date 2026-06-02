@@ -1,0 +1,44 @@
+<!-- Confirmation Dialog Modal Component -->
+
+<!-- Wrapper -->
+<div id="dialogBox" class="modal fade">
+
+    <!-- Dialog Box -->
+    <div class="modal-dialog">
+
+        <!-- Content -->
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="text-center m-auto">
+                <h4 class="modal-title">@Title</h4>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body text-center">
+                <p>@Message</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer m-auto border-0">
+                <button class="utility-button utility-action" @onclick="HandleAction" data-bs-dismiss="modal">Yes</button>
+                <button class="utility-button utility-cancel" data-bs-dismiss="modal">No</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@code
+{
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Message { get; set; } = string.Empty;
+
+    [Parameter] public EventCallback OnAction { get; set; }
+
+    private async Task HandleAction()
+    {
+        await OnAction.InvokeAsync();
+    }
+}

@@ -12,10 +12,9 @@ namespace PacificBattle
     {
         public static void Main(string[] args)
         {
-            // Initialize Bootstrap Logging
+            // Enable Bootstrap Logging
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .WriteTo.Console(outputTemplate: "{Timestamp: ddd-MMM-dd HH:mm:ss} [{Level:u3}] -- {Message}{NewLine}{Exception}")
+                .WriteTo.Console()
                 .CreateBootstrapLogger();
             Log.Information("Running Pacific Battle...");
 
@@ -24,14 +23,39 @@ namespace PacificBattle
                 // Create Builder
                 var builder = WebApplication.CreateBuilder(args);
 
+                // Configure Logging Environment
+                var logDir = Path.Combine(
+                    builder.Environment.ContentRootPath,
+                    "Logs");
+                var logFile = Path.Combine(
+                    logDir,
+                    "PacificBattleLog-.txt");
+                var errorFile = Path.Combine(
+                    logDir,
+                    "PacificBattleErrors-.txt");
+                var logTemplate = 
+                    "{Timestamp: ddd-MMM-dd HH:mm:ss} [{Level:u3}] -- {Message}{NewLine}{Exception}";
+                Directory.CreateDirectory(logDir);
+
                 // Replace Bootstrap Logger with Host Logger
-                builder.Logging.ClearProviders();
-                builder.Host.UseSerilog((hostingContext, services, loggerConfiguration) =>
+                builder.Services.AddSerilog((services, logConfig) =>
                 {
-                    // Configure Logger
-                    loggerConfiguration
-                        .ReadFrom.Configuration(hostingContext.Configuration)
-                        .Enrich.FromLogContext();
+                    logConfig
+                        .ReadFrom.Configuration(builder.Configuration)
+                        .ReadFrom.Services(services)
+                        .Enrich.FromLogContext()
+                        .WriteTo.File(
+                            logFile,
+                            rollingInterval: RollingInterval.Day,
+                            rollOnFileSizeLimit: true,
+                            outputTemplate: logTemplate)
+                        .WriteTo.File(
+                            errorFile,
+                            rollingInterval: RollingInterval.Day,
+                            rollOnFileSizeLimit: true,
+                            restrictedToMinimumLevel: LogEventLevel.Error,
+                            outputTemplate: logTemplate
+                        );
                 },
                 preserveStaticLogger: false);
 
@@ -48,14 +72,18 @@ namespace PacificBattle
                 // Register DbContext
                 builder.Services.AddDbContext<AppDbContext>(options =>
                 {
-                    var dbPath = Path.Combine(builder.Environment.ContentRootPath, "Data", "pacificbattle.db");
+                    var dbPath = Path.Combine(
+                        builder.Environment.ContentRootPath, 
+                        "Data", 
+                        "pacificbattle.db"
+                    );
                     options.UseSqlite($"Data Source={dbPath}");
                 });
 
                 // Build App
                 var app = builder.Build();
 
-                // Configure HTTP request pipeline
+                // Configure Middleware
                 if (!app.Environment.IsDevelopment())
                 {
                     app.UseExceptionHandler("/Error");
@@ -64,14 +92,13 @@ namespace PacificBattle
                 app.UseHttpsRedirection();
                 app.UseStaticFiles();
                 app.UseAntiforgery();
+
+                // Add Mappings
                 app.MapRazorComponents<App>()
                     .AddInteractiveServerRenderMode();
                 app.MapControllers();
 
-                Log.Information("*****************************************");
-                Log.Information("Commencing battle");
-                Log.Information("");
-
+                // Launch App
                 app.Run();
             }
             catch (Exception ex)

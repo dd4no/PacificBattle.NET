@@ -1,26 +1,27 @@
-﻿<div id="logbox" class="text-center">
+﻿<!-- Combat Log Component-->
 
-    <h5 class="text-center"><b>Combat Results</b></h5>
+<div id="messagebox" class="text-center pb-2">
 
-    @foreach (var log in Messages)
+    @foreach (var message in Messages)
     {
-        <h6>@log</h6>
+        <h6>@message</h6>
     }
 
 </div>
 
-
 <style>
-    #logbox {
-        height: 90%;
+    #messagebox {
+        height: 92%;
         width: 100%;
+        margin: 0 auto;
+        margin-top: .75rem;
         padding: .5rem;
         border: 1px solid black;
-        border-radius: 10px;
+        border-radius: 15px;
         overflow-y: auto;
+        background-color: antiquewhite;
     }
 </style>
-
 
 @code 
 {

@@ -1,86 +1,59 @@
-﻿
-<div class="text-center shipTile @color">
+﻿<!-- Ship Tile Component -->
 
-    <h3 class="strong">@Ship.ShipName</h3>
+<div class="text-center ship-tile @_color @CssClass">
 
-    <div class="d-flex justify-content-between">
-        <p class="@(() => Ship.HasAttackBonus ? "strong border" : string.Empty )">@Ship.Guns</p>
+    <!-- Badge -->
+    <span class="badge text-bg-danger target-badge"
+          hidden="@(!IsTargeted(@Ship))">
+        @Ship.IncomingAttackCount
+    </span>
+
+    <!-- ID -->
+    <h6>@Ship.Side</h6>
+    <h3><b>@Ship.ShipName</b></h3>
+    <h6>@Ship.Type</h6>
+
+    <!-- Capabilities -->
+    <div class="d-flex justify-content-around mt-2">
+        <p class="@(Ship.HasAttackBonus ? "attack-bonus" : "" )">@Ship.Guns</p>
         <p class="">@Ship.Armor</p>
         <p class="">@Ship.Speed</p>
         @if (Ship.Airstrike != 0)
         {
-            <p>@Ship.Airstrike</p>
+            <p class="ps-2">@Ship.Airstrike</p>
         }
     </div>
 
 </div>
-
-
-<style>
-    .shipTile {
-        width: 300px;
-        height: 300px;
-        margin: 2rem;
-        padding: 2rem;
-        border: 2px solid black;
-    }
-
-    .blue {
-    background-color: blue;
-    color: white;
-    }
-    .red {
-    background-color: red;
-    }
-    .green {
-    background-color: green;
-    }
-    .yellow {
-    background-color: yellow;
-    }
-</style>
-
 
 @code 
 {
     [Parameter]
     public CombatShip Ship { get; set; } = new();
 
-    private string color = string.Empty;
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+    private string _color = string.Empty;
 
     protected override void OnParametersSet()
     {
-        color = SetColor(Ship.NavyId);
-        StateHasChanged();
+        _color = Ship.NavyId switch
+        {
+            1 => "blue",
+            2 => "red",
+            3 => "green",
+            4 => "yellow",
+            _ => string.Empty
+        };
     }
 
-    private string SetColor(int navyId)
+    private bool IsTargeted(CombatShip ship)
     {
-        string color = string.Empty;
-        switch (navyId)
+        if (ship.IncomingAttackCount > 0)
         {
-            // US
-            case 1:
-                color = "blue";
-                break;
-            // Japanese
-            case 2:
-                color = "red";
-                break;
-            // British
-            case 3:
-                color = "green";
-                break;
-            // Dutch + Austrailian
-            case 4:
-                color = "yellow";
-                break;
-
-            default:
-                color = string.Empty;
-                break;
+            return true;
         }
-
-        return color;
+        return false;
     }
 }

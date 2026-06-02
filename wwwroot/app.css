@@ -3,7 +3,29 @@ h1:focus {
     outline: none;
 }
 
+p,h1,h2,h3,h4,h5,h6 {
+    margin: 0 !important;
+}
+
 /* Custom Classes */
+.app-button {
+    width: 200px;
+    height: 40px;
+    padding: .25rem;
+    border-radius: 10px;
+}
 
+.utility-button{
+    width: 80px;
+    height: 40px;
+    border-radius: 10px;
+}
 
-/* Specific Elements */
+.utility-action {
+    background-color: red;
+}
+
+.utility-cancel {
+    background-color: gray;
+}
+

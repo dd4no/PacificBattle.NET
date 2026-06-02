@@ -1,171 +1,113 @@
 ﻿@page "/"
-@using PacificBattle.CombatResolution
-@using PacificBattle.Interfaces
-@inject ILogger<BattleBox> logger
-@inject IFleetManager fm
+
+<ConfirmationDialog 
+    Title="Confirm Action"
+    Message="This will clear all current attack orders.  Are you sure?"
+    OnAction="ClearOrders">
+</ConfirmationDialog>
 
 <div id="page">
 
-    <div class="p-4">
+    <div id="sea-area" class="flex-column">
+        <div id="top-bar">
 
-        <div id="topbar"></div>
-
-        <div id="battlebox" class="d-flex justify-content-around p-4">
-
-            @* Attack Ship *@
-            <div class="w-25 flex-column text-center ms-4">
-                <ShipTile Ship="Aggressor"></ShipTile>
-                <p>Total Damage: @Aggressor.Damage.TotalDamage</p>
+            <!-- Get Ships -->
+            <div class="button-group">
+                <button 
+                    id="start-button"
+                    class="app-button" 
+                    hidden="@(!_isRoundComplete)"
+                    @onclick="GetShips">
+                    <b>Get Ships</b>
+                </button>
             </div>
 
-            @* Combat Results *@
-            <div class="w-50">                
-                <CombatLog Messages="BattleLogs" />
+            <!-- Enter Selection Mode -->
+            <div class="button-group" hidden="@_isRoundComplete">
+                <button
+                    id="selectButton" 
+                    class="app-button" 
+                    hidden="@(_inSelectionMode)"
+                    @onclick="StartSelecting">
+                    <b>Pair Ships</b>
+                </button>
             </div>
 
-            @* Defender Ship *@
-            <div class="w-25 flex-column text-center me-4">
-                <ShipTile Ship="Defender"></ShipTile>
-                <p>Total Damage: @Defender.Damage.TotalDamage</p>
+            <!-- Reset Pair -->
+            <div class="button-group">
+                <button 
+                    id="reset-button" 
+                    class="app-button" 
+                    hidden="@(!_inSelectionMode)"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#dialogBox">
+                    <b>Reset Pairs</b>
+                </button>
+            </div>
+
+            <!-- Start Battle -->
+            <div class="button-group">
+                <button 
+                    id="battle-button" 
+                    class="app-button" 
+                    hidden="@(!_inSelectionMode)" 
+                    @onclick="ResolveCombat">
+                    <b>Start Battle</b>
+                </button>
             </div>
 
         </div>
 
-        <div id="buttonbox" class="d-flex justify-content-around p-4">
 
-            <div class="p-1">
-                <button class="btn btn-danger m-1 p-3" @onclick="StartCombat" hidden="@isResolved"><b>Attack!</b></button>
+        <div id="ship-box">
+
+            <!-- Attacking Ships -->
+            <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
+                @foreach (var ship in Aggressors)
+                {   
+                    <div @onclick="() => SelectShip(ship)">
+                        <ShipTile 
+                            Ship="ship" 
+                            CssClass="@GetShipCss(ship)">
+                        </ShipTile>
+                    </div>             
+                }
             </div>
 
-            <div class="p-1">
-                <button class="btn btn-success m-1 p-3" @onclick="GetShips" hidden="@(!isResolved)"><b>Get Ships</b></button>
-            </div>
+            <!-- Defending Ships -->
+            <div class="d-flex justify-content-around mt-4 pt-4">
+                @foreach (var ship in Defenders)
+                {
+                    <div @onclick="() => SelectShip(ship)">
+                        <span class="badge text-bg-danger"
+                              hidden="@ship.IncomingAttackCount == 0">
+                            @ship.IncomingAttackCount
+                        </span>
 
+                        <ShipTile 
+                            Ship="ship" 
+                            CssClass="@GetShipCss(ship)">
+                        </ShipTile>
+                    </div>             
+                }
+            </div>
+         
         </div>
+
+    </div>
+
+    <div id="log-box">
+
+        <!-- Combat Logs -->
+        <h4 class="text-center p-3">Combat Log</h4>
+        <CombatLog Messages="BattleLogs" />
 
     </div>
 
 </div>
 
 
-<style>
-    #page {
-        height: 100vh;
-        margin: 0 auto;
-        background-color: black;
-    }
-    #topbar {
-        height: 25vh;
-        background-color: gray;
-    }
-
-    #battlebox {
-        height: 50vh;
-        background-color: cyan;
-    }
-
-    #buttonbox {
-        height: 25vh;
-        background-color: gray;
-    }
-</style>
 
 
-@code 
-{
-    // Combatants
-    public CombatShip Aggressor { get; set; } = new();
-    public CombatShip Defender { get; set; } = new();
+ 
 
-    // Display
-    public List<string> BattleLogs { get; set; } = [];
-
-    // Toggle Swap
-    private bool isReturnRound;
-    private bool isResolved;
-
-    // Initialize
-    protected override void OnInitialized()
-    {
-        GetShips();
-    } 
-
-    private void Reset()
-    {
-        BattleLogs.Clear();
-        isReturnRound = false;
-        isResolved = false;
-    }
-
-    // Populate
-    private void GetShips()
-    {
-        Reset();
-        Aggressor = fm.BuildRandomShipByNavy(2);
-        Defender = fm.BuildRandomShipByNavy(1);
-        
-        BattleLogs.Add($"{Aggressor.ShipName} vs. {Defender.ShipName}");
-    }
-
-    // Battle
-    private void StartCombat()
-    {
-        if (Aggressor.Guns != 0)
-        {
-            BattleLogs.Add($"{Aggressor.ShipName} attacks with {Aggressor.Guns} gun(s)");                  
-            Attack(Aggressor.Guns, Defender);
-            DetermineStatus(Defender);
-        }
-        else
-        {
-            BattleLogs.Add("Aircraft carrier has no guns to attack with.");                        
-                              
-        }
-
-        if (!isReturnRound) 
-        {
-            BattleLogs.Add($"{Defender.ShipName} returns fire");            
-            Swap();
-            isReturnRound = true;
-        }
-        else
-        {
-            BattleLogs.Add("Action complete");            ;
-            isResolved = true;
-            foreach (var log in BattleLogs)
-            {
-                logger.LogInformation(log);
-            }
-            logger.LogInformation("");
-        }
-    }
-
-    private void Attack(int guns, CombatShip target)
-    {
-        AttackCoordinator.Target = target;
-        AttackCoordinator.ResolveAttack(guns);
-    }
-
-    private void DetermineStatus(CombatShip target)
-    {
-        if (target.Damage.IsDisabled)
-        {
-            BattleLogs.Add($"{target.ShipName} has been disabled!");
-        };
-        foreach (var log in target.Damage.DamageLogs)
-        {
-            BattleLogs.Add(log);
-        }
-        if (target.IsSunk)
-        {
-            BattleLogs.Add($"{target.ShipName} has been sunk!");
-        };
-    }
-
-    // Switch Sides
-    private void Swap(){
-        CombatShip temp = Aggressor;
-        Aggressor = Defender;
-        Defender = temp;
-    }
-}

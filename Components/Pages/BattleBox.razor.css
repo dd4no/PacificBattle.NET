@@ -1,0 +1,59 @@
+#page {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    background-color: gray;
+}
+
+#sea-area {
+    width: 85%;
+}
+
+#top-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 60px;
+    margin-bottom: 1.5rem;
+    padding-top: 1rem;
+}
+
+.button-group {
+    width: 25%;
+    text-align: center;
+}
+
+#ship-box {
+    height: 90%;
+    margin-left:.5rem;
+    padding-top: 80px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: cyan;
+}
+
+#log-box {
+    height: 100%;
+    width: 15%;
+    padding: .5rem;
+}
+
+#reset-button {
+    background-color: darkslategray;
+    color: white;
+}
+
+#selectButton {
+    background-color: yellow;
+}
+
+#start-button {
+    background-color: green;
+    color: yellow;
+}
+
+#battle-button {
+    background-color: red;
+    color: yellow;
+}
+
