@@ -1,5 +1,4 @@
 ﻿using PacificBattle.Ships;
-using Serilog;
 
 namespace PacificBattle.CombatResolution
 {
@@ -10,14 +9,15 @@ namespace PacificBattle.CombatResolution
         public bool IsPairing { get; set; }
         public string Message { get; set; } = string.Empty;
 
-        public bool GiveAttackOrder(CombatShip ship)
+        public bool IssueAttackOrder(CombatShip ship)
         {
+            Message = string.Empty;
+
             // Select ship
             if (PendingAttacker is null)
             {
                 PendingAttacker = ship;
                 IsPairing = true;
-                Message = $"{ship.ShipName} selected";
                 return true;
             }
 
@@ -26,12 +26,11 @@ namespace PacificBattle.CombatResolution
             {
                 PendingAttacker = null;
                 IsPairing = false;
-                Message = $"{ship.ShipName} deselected";
                 return true;
             }
 
             // Add Attack Order
-            Orders.Add( new()
+            Orders.Add( new AttackOrder()
             {
                 Attacker = PendingAttacker,
                 Defender = ship
@@ -42,7 +41,6 @@ namespace PacificBattle.CombatResolution
             // Log Order
             var pair = Orders.Last();
             Message = $"{pair.Attacker.ShipName} attacks {pair.Defender.ShipName}";
-            Log.Information("{msg}", Message);
 
             // End selection round
             PendingAttacker = null;
@@ -52,24 +50,24 @@ namespace PacificBattle.CombatResolution
 
         public void ClearOrders()
         {
+            // Ensure all flags are cleared
             if (PendingAttacker is not null)
             {
                 PendingAttacker.HasAttackOrder = false;
                 PendingAttacker = null;
             }
-
             IsPairing = false;
 
+            // Reset selections if needed
             foreach (var order in Orders)
             {
                 order.Attacker.HasAttackOrder = false;
                 order.Defender.IncomingAttackCount = 0;
             }
 
+            // Clear Orders
             Orders.Clear();
-
-            Message = $"All match-ups reset";
-            Log.Information("{msg}", Message);
+            Message = "All attack orders cleared";
         }
     }
 }

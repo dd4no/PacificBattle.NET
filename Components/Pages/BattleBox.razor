@@ -2,14 +2,13 @@
 
 <ConfirmationDialog 
     Title="Confirm Action"
-    Message="This will clear all current match-ups.  Are you sure?"
-    OnAction="ResetPairings">
+    Message="This will clear all current attack orders.  Are you sure?"
+    OnAction="ClearOrders">
 </ConfirmationDialog>
 
 <div id="page">
 
     <div id="sea-area" class="flex-column">
-
         <div id="top-bar">
 
             <!-- Get Ships -->
@@ -17,18 +16,18 @@
                 <button 
                     id="start-button"
                     class="app-button" 
-                    disabled="@_selecting"
+                    hidden="@(!_isRoundComplete)"
                     @onclick="GetShips">
                     <b>Get Ships</b>
                 </button>
             </div>
 
             <!-- Enter Selection Mode -->
-            <div class="button-group">
+            <div class="button-group" hidden="@_isRoundComplete">
                 <button
                     id="selectButton" 
                     class="app-button" 
-                    hidden="@_selecting" 
+                    hidden="@(_inSelectionMode)"
                     @onclick="StartSelecting">
                     <b>Pair Ships</b>
                 </button>
@@ -39,7 +38,7 @@
                 <button 
                     id="reset-button" 
                     class="app-button" 
-                    hidden="@(!_selecting)" 
+                    hidden="@(!_inSelectionMode)"
                     data-bs-toggle="modal" 
                     data-bs-target="#dialogBox">
                     <b>Reset Pairs</b>
@@ -51,7 +50,7 @@
                 <button 
                     id="battle-button" 
                     class="app-button" 
-                    hidden="@(!_selecting)" 
+                    hidden="@(!_inSelectionMode)" 
                     @onclick="ResolveCombat">
                     <b>Start Battle</b>
                 </button>
@@ -59,9 +58,10 @@
 
         </div>
 
+
         <div id="ship-box">
 
-            @* Attacking Ships *@
+            <!-- Attacking Ships -->
             <div class="d-flex justify-content-around mt-4 pt-4 pb-4">
                 @foreach (var ship in Aggressors)
                 {   
@@ -74,7 +74,7 @@
                 }
             </div>
 
-            @* Defending Ships *@
+            <!-- Defending Ships -->
             <div class="d-flex justify-content-around mt-4 pt-4">
                 @foreach (var ship in Defenders)
                 {
@@ -98,7 +98,7 @@
 
     <div id="log-box">
 
-        @* Combat Results *@
+        <!-- Combat Logs -->
         <h4 class="text-center p-3">Combat Log</h4>
         <CombatLog Messages="BattleLogs" />
 
